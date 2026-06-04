@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messaggi Indie</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>* { margin:0; padding:0; box-sizing:border-box; }
+:root { --deep:#0d0d14; --card:#16161f; --card2:#1c1c28; --border:#2a2a3a; --accent:#e8ff47; --accent2:#ff4d6d; --green:#4dff91; --text:#f0f0f0; --muted:#6b6b7e; --muted2:#4a4a5e; }
+body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--text); min-height:100vh; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+@keyframes pop-in { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+@keyframes fade-up { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slide-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+@keyframes scan-line { 0%,100%{opacity:.3} 50%{opacity:.9} }
+@keyframes float-up { 0%{opacity:0;transform:translateY(0) scale(0)} 10%{opacity:.6} 90%{opacity:.2} 100%{opacity:0;transform:translateY(-100vh) scale(1.5)} }
+.toast { position:fixed; bottom:24px;left:50%; transform:translateX(-50%) translateY(80px); background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:12px 20px; font-size:13px; font-weight:500; color:var(--text); z-index:9999; transition:transform .3s cubic-bezier(.34,1.56,.64,1); white-space:nowrap; display:flex; align-items:center; gap:8px; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.success { border-color:rgba(77,255,145,.3); }
+.toast.error { border-color:rgba(255,77,109,.3); }
+.live-dot { width:7px; height:7px; border-radius:50%; background:var(--accent2); animation:pulse-dot 1.4s ease-in-out infinite; }
+::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:40px 20px; position:relative; overflow:hidden; }
+body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse 60% 40% at 15% 10%,rgba(232,255,71,.055) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 85% 90%,rgba(255,77,109,.06) 0%,transparent 60%); pointer-events:none; }
+.form-card { width:100%; max-width:400px; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:32px 28px 28px; }
+.form-event-tag { display:inline-flex; align-items:center; gap:6px; font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); background:rgba(232,255,71,.09); border:1px solid rgba(232,255,71,.22); border-radius:20px; padding:4px 12px; margin-bottom:14px; }
+.form-event-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse-dot 1.4s ease-in-out infinite; }
+.form-event-name { font-family:'Syne',sans-serif; font-size:22px; font-weight:900; color:var(--text); line-height:1.1; letter-spacing:-.03em; margin-bottom:4px; }
+.form-event-sub { font-size:12px; color:var(--muted); margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid var(--border); }
+.f-label { font-size:10px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; display:flex; align-items:center; gap:6px; }
+.f-label em { font-style:normal; font-weight:400; text-transform:none; letter-spacing:0; color:var(--muted2); font-size:10px; }
+.f-input { width:100%; background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:11px; padding:12px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; margin-bottom:16px; transition:border-color .2s,background .2s; resize:none; }
+.f-input:focus { border-color:rgba(232,255,71,.5); background:rgba(232,255,71,.025); }
+.f-input::placeholder { color:var(--muted2); }
+.f-textarea { height:120px; line-height:1.55; }
+.f-meta { display:flex; justify-content:flex-end; margin-top:-10px; margin-bottom:20px; }
+.f-charcount { font-size:10px; color:var(--muted2); }
+.f-charcount span { color:var(--accent); }
+.f-charcount.warn span { color:var(--accent2); }
+.btn-send { width:100%; background:var(--accent); color:#0a0a0a; font-family:'Syne',sans-serif; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; border:none; border-radius:12px; padding:15px; cursor:pointer; transition:transform .15s,opacity .15s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-send:hover { transform:translateY(-1px); opacity:.92; }
+.btn-send:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+.f-privacy { font-size:10px; color:var(--muted2); text-align:center; margin-top:10px; line-height:1.5; }
+.form-success { display:none; flex-direction:column; align-items:center; text-align:center; padding:20px 0 10px; gap:12px; }
+.success-icon { font-size:40px; animation:pop-in .4s cubic-bezier(.34,1.56,.64,1); }
+.success-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--text); }
+.success-sub { font-size:13px; color:var(--muted); line-height:1.5; }
+.btn-another { margin-top:8px; padding:10px 24px; background:transparent; border:1px solid var(--border); border-radius:10px; color:var(--muted); font-family:'Syne',sans-serif; font-size:12px; font-weight:700; cursor:pointer; transition:all .18s; }
+.btn-another:hover { border-color:var(--accent); color:var(--accent); }</style>
+</head>
+<body>
+<div class="form-card">
+  <div class="form-event-tag">Live Now</div>
+  <div class="form-event-name" id="pub-event-name">MESSAGGI <span style="color:var(--accent)">INDIE</span></div>
+  <div class="form-event-sub" id="pub-event-sub">Sabato 7 Giugno · Arena Nord</div>
+  <div id="form-body">
+    <label class="f-label">Il tuo nome <em>(opzionale)</em></label>
+    <input class="f-input" id="input-nome" type="text" placeholder="Es. Marco, Sara…" maxlength="40" autocomplete="off">
+    <label class="f-label">Il tuo messaggio</label>
+    <textarea class="f-input f-textarea" id="input-msg" placeholder="Scrivi il tuo messaggio…" maxlength="140"></textarea>
+    <div class="f-meta">
+      <div class="f-charcount" id="charcount"><span>0</span> / 140</div>
+    </div>
+    <button class="btn-send" id="btn-send" onclick="submitMsg()">Invia messaggio <span>→</span></button>
+    <p class="f-privacy">Il tuo messaggio verrà moderato prima di apparire sullo schermo</p>
+  </div>
+  <div class="form-success" id="form-success">
+    <div class="success-icon">🎶</div>
+    <div class="success-title">Messaggio inviato!</div>
+    <div class="success-sub">Il moderatore lo approverà a breve.<br>Tieni d'occhio lo schermo 👀</div>
+    <button class="btn-another" onclick="resetForm()">Invia un altro messaggio</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyApLhRbbVD2J84mVLEx8yMHI93U-D-ofQQ",
+  authDomain: "messaggi-indie.firebaseapp.com",
+  databaseURL: "https://messaggi-indie-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "messaggi-indie",
+  storageBucket: "messaggi-indie.firebasestorage.app",
+  messagingSenderId: "955832496076",
+  appId: "1:955832496076:web:77fdcbd958842f65673769"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+const msgsRef = ref(db, 'messages');
+const settingsRef = ref(db, 'settings');
+let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#e8ff47' };
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function lighten(hex) { let c=hex.replace('#',''); let r=Math.min(255,parseInt(c.slice(0,2),16)+60).toString(16).padStart(2,'0'); let g=Math.min(255,parseInt(c.slice(2,4),16)+60).toString(16).padStart(2,'0'); let b=Math.min(255,parseInt(c.slice(4,6),16)+60).toString(16).padStart(2,'0'); return '#'+r+g+b; }
+function hexToRgba(hex,alpha) { hex=hex.replace('#',''); return `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},${alpha})`; }
+function initials(name) { if(!name||!name.trim()) return '?'; const p=name.trim().split(' '); return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():name.slice(0,2).toUpperCase(); }
+function fmtTime(ts) { const d=new Date(ts); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+function showToast(msg,type='') { const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+type; setTimeout(()=>t.classList.remove('show'),2800); }
+
+onValue(settingsRef, snap => {
+  if(snap.exists()) {
+    settings = {...settings, ...snap.val()};
+    const color = settings.accentColor;
+    const parts = settings.eventName.trim().split(' '), last = parts.pop(), rest = parts.join(' ');
+    const el = document.getElementById('pub-event-name');
+    if(el) el.innerHTML = (rest?rest+' ':'')+`<span style="color:${color}">${last}</span>`;
+    const sub = document.getElementById('pub-event-sub');
+    if(sub) sub.textContent = settings.eventSub;
+    document.documentElement.style.setProperty('--accent', color);
+  }
+});
+
+document.getElementById('input-msg').addEventListener('input', function() {
+  const len = this.value.length;
+  const cc = document.getElementById('charcount');
+  cc.innerHTML = `<span>${len}</span> / 140`;
+  cc.className = 'f-charcount'+(len>120?' warn':'');
+  document.getElementById('btn-send').disabled = len===0;
+});
+document.getElementById('btn-send').disabled = true;
+
+window.submitMsg = async function() {
+  const nome = document.getElementById('input-nome').value.trim();
+  const msg  = document.getElementById('input-msg').value.trim();
+  if(!msg) return;
+  const btn = document.getElementById('btn-send');
+  btn.disabled=true; btn.textContent='Invio…';
+  try {
+    await push(msgsRef, { nome: nome||null, msg, ts: Date.now(), status: 'pending' });
+    document.getElementById('form-body').style.display='none';
+    document.getElementById('form-success').style.display='flex';
+  } catch(e) {
+    showToast('⚠ Errore di connessione','error');
+    btn.disabled=false; btn.innerHTML='Invia messaggio <span>→</span>';
+  }
+};
+
+window.resetForm = function() {
+  document.getElementById('input-nome').value='';
+  document.getElementById('input-msg').value='';
+  document.getElementById('charcount').innerHTML='<span>0</span> / 140';
+  document.getElementById('btn-send').disabled=true;
+  document.getElementById('btn-send').innerHTML='Invia messaggio <span>→</span>';
+  document.getElementById('form-body').style.display='block';
+  document.getElementById('form-success').style.display='none';
+};
+</script>
+</body>
+</html>
