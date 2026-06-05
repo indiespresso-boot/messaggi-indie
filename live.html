@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live — Messaggi Indie</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,wght@0,300;0,400&display=swap" rel="stylesheet">
+<style>* { margin:0; padding:0; box-sizing:border-box; }
+:root { --deep:#0d0d14; --card:#16161f; --card2:#1c1c28; --border:#2a2a3a; --accent:#e8ff47; --accent2:#ff4d6d; --green:#4dff91; --text:#f0f0f0; --muted:#6b6b7e; --muted2:#4a4a5e; }
+body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--text); min-height:100vh; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+@keyframes pop-in { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+@keyframes fade-up { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slide-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+@keyframes scan-line { 0%,100%{opacity:.3} 50%{opacity:.9} }
+@keyframes float-up { 0%{opacity:0;transform:translateY(0) scale(0)} 10%{opacity:.6} 90%{opacity:.2} 100%{opacity:0;transform:translateY(-100vh) scale(1.5)} }
+.toast { position:fixed; bottom:24px;left:50%; transform:translateX(-50%) translateY(80px); background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:12px 20px; font-size:13px; font-weight:500; color:var(--text); z-index:9999; transition:transform .3s cubic-bezier(.34,1.56,.64,1); white-space:nowrap; display:flex; align-items:center; gap:8px; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.success { border-color:rgba(77,255,145,.3); }
+.toast.error { border-color:rgba(255,77,109,.3); }
+.live-dot { width:7px; height:7px; border-radius:50%; background:var(--accent2); animation:pulse-dot 1.4s ease-in-out infinite; }
+::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+body { display:flex; align-items:center; justify-content:center; min-height:100vh; overflow:hidden; position:relative; }
+.live-bg { position:absolute; inset:0; background:#0a0a0f; z-index:0; }
+.live-bg-gradient { position:absolute; inset:0; z-index:1; transition:background 1s; }
+.particles { position:absolute; inset:0; z-index:2; overflow:hidden; pointer-events:none; }
+.particle { position:absolute; border-radius:50%; opacity:0; animation:float-up linear infinite; }
+.live-line { position:absolute; z-index:2; }
+.live-line-top { top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,transparent,var(--accent),transparent); animation:scan-line 3s ease-in-out infinite; }
+.live-line-bot { bottom:0;left:0;right:0;height:3px; background:linear-gradient(90deg,transparent,var(--accent2),transparent); animation:scan-line 3s ease-in-out infinite reverse; }
+.live-corner { position:absolute; top:20px;right:24px; z-index:20; display:flex; align-items:center; gap:7px; font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--accent2); background:rgba(255,77,109,.1); border:1px solid rgba(255,77,109,.3); border-radius:20px; padding:5px 12px; }
+.live-content { position:relative; z-index:10; width:100%; max-width:900px; padding:60px 40px; text-align:center; }
+.live-event-label { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); opacity:.8; margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:10px; }
+.live-event-label::before,.live-event-label::after { content:''; height:1px; width:40px; background:currentColor; opacity:.4; }
+.live-event-name-display { font-family:'Syne',sans-serif; font-size:clamp(28px,5vw,52px); font-weight:900; letter-spacing:-.04em; line-height:1; margin-bottom:48px; transition:color .5s; }
+.dedica-container { min-height:220px; display:flex; align-items:center; justify-content:center; }
+.dedica-box { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:24px; padding:44px 52px; max-width:780px; width:100%; backdrop-filter:blur(10px); position:relative; overflow:hidden; }
+.dedica-box::before { content:'\275D'; position:absolute; top:12px;left:24px; font-size:60px; opacity:.08; font-family:Georgia,serif; line-height:1; }
+.dedica-waiting { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:rgba(255,255,255,.2); letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; gap:12px; justify-content:center; }
+.dedica-waiting::before { content:''; width:8px;height:8px; border-radius:50%; background:rgba(255,255,255,.2); animation:pulse-dot 2s infinite; }
+.dedica-text { font-family:'DM Sans',sans-serif; font-size:clamp(18px,3vw,28px); font-weight:300; font-style:italic; line-height:1.45; color:var(--text); margin-bottom:28px; animation:fade-up .6s cubic-bezier(.22,1,.36,1); }
+.dedica-sender { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); animation:fade-up .6s .15s cubic-bezier(.22,1,.36,1) both; }
+.live-queue-info { position:absolute; bottom:24px; left:50%; transform:translateX(-50%); z-index:20; font-size:11px; color:rgba(255,255,255,.25); font-family:'Syne',sans-serif; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.live-transition { position:absolute; inset:0; z-index:50; background:var(--deep); opacity:0; pointer-events:none; transition:opacity .3s; }
+.live-transition.flash { opacity:1; }</style>
+</head>
+<body>
+<div class="live-bg"></div>
+<div class="live-bg-gradient" id="live-bg-gradient"></div>
+<div class="particles" id="particles"></div>
+<div class="live-line live-line-top"></div>
+<div class="live-line live-line-bot"></div>
+<div class="live-corner"><div class="live-dot"></div>LIVE</div>
+<div class="live-content">
+  <div class="live-event-label">Messaggi dal pubblico</div>
+  <div class="live-event-name-display" id="live-event-name">MESSAGGI INDIE</div>
+  <div class="dedica-container">
+    <div class="dedica-box">
+      <div class="dedica-waiting" id="dedica-waiting">In attesa di messaggi</div>
+      <div style="display:none" id="dedica-content">
+        <div class="dedica-text" id="dedica-text"></div>
+        <div class="dedica-sender" id="dedica-sender"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="live-queue-info" id="live-queue-info"></div>
+<div class="live-transition" id="live-transition"></div>
+<div class="toast" id="toast"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyApLhRbbVD2J84mVLEx8yMHI93U-D-ofQQ",
+  authDomain: "messaggi-indie.firebaseapp.com",
+  databaseURL: "https://messaggi-indie-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "messaggi-indie",
+  storageBucket: "messaggi-indie.firebasestorage.app",
+  messagingSenderId: "955832496076",
+  appId: "1:955832496076:web:77fdcbd958842f65673769"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+const msgsRef = ref(db, 'messages');
+const settingsRef = ref(db, 'settings');
+let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#e8ff47', duration: 8 };
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function lighten(hex) { let c=hex.replace('#',''); let r=Math.min(255,parseInt(c.slice(0,2),16)+60).toString(16).padStart(2,'0'); let g=Math.min(255,parseInt(c.slice(2,4),16)+60).toString(16).padStart(2,'0'); let b=Math.min(255,parseInt(c.slice(4,6),16)+60).toString(16).padStart(2,'0'); return '#'+r+g+b; }
+function hexToRgba(hex,alpha) { hex=hex.replace('#',''); return `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},${alpha})`; }
+function initials(name) { if(!name||!name.trim()) return '?'; const p=name.trim().split(' '); return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():name.slice(0,2).toUpperCase(); }
+function fmtTime(ts) { const d=new Date(ts); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+function showToast(msg,type='') { const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+type; setTimeout(()=>t.classList.remove('show'),2800); }
+
+let allMessages = {};
+let liveQueue = [];
+let currentlyShowing = null;
+let displayTimer = null;
+
+onValue(settingsRef, snap => {
+  if(snap.exists()) {
+    settings = {...settings,...snap.val()};
+    const c = settings.accentColor;
+    const ne = document.getElementById('live-event-name');
+    if(ne) { ne.textContent=settings.eventName; ne.style.color=c; }
+    const bg = document.getElementById('live-bg-gradient');
+    if(bg) bg.style.background=`radial-gradient(ellipse 70% 60% at 50% 50%,${hexToRgba(c,.06)} 0%,transparent 70%)`;
+    document.querySelectorAll('.live-line-top').forEach(el=>el.style.background=`linear-gradient(90deg,transparent,${c},transparent)`);
+    document.documentElement.style.setProperty('--accent',c);
+  }
+});
+
+onValue(msgsRef, snap => {
+  allMessages={};
+  if(snap.exists()) snap.forEach(c=>{ allMessages[c.key]={fbKey:c.key,...c.val()}; });
+  syncQueue();
+});
+
+function syncQueue() {
+  const ids = new Set(liveQueue.map(x=>x.fbKey));
+  Object.values(allMessages)
+    .filter(m=>m.status==='approved'&&!ids.has(m.fbKey))
+    .sort((a,b)=>a.ts-b.ts)
+    .forEach(m=>liveQueue.push(m));
+  updateQueueInfo();
+  if(!currentlyShowing&&liveQueue.length>0) showNext();
+}
+
+function showNext() {
+  if(!liveQueue.length) { showWaiting(); return; }
+  const msg = liveQueue.shift();
+  currentlyShowing = msg;
+  remove(ref(db,'messages/'+msg.fbKey));
+  updateQueueInfo();
+  const ov = document.getElementById('live-transition');
+  ov.classList.add('flash');
+  setTimeout(()=>{ ov.classList.remove('flash'); renderMsg(msg); }, 300);
+  clearTimeout(displayTimer);
+  displayTimer = setTimeout(showNext, (settings.duration||8)*1000);
+}
+
+function renderMsg(msg) {
+  document.getElementById('dedica-waiting').style.display='none';
+  document.getElementById('dedica-content').style.display='block';
+  const dt=document.getElementById('dedica-text'), ds=document.getElementById('dedica-sender');
+  dt.style.animation='none'; ds.style.animation='none';
+  void dt.offsetWidth; void ds.offsetWidth;
+  dt.style.animation=''; ds.style.animation='';
+  dt.textContent = msg.msg;
+  ds.textContent = msg.nome ? '— '+msg.nome : '— Anonimo';
+  ds.style.color = settings.accentColor;
+  spawnParticles();
+}
+
+function showWaiting() {
+  document.getElementById('dedica-waiting').style.display='flex';
+  document.getElementById('dedica-content').style.display='none';
+  currentlyShowing=null; updateQueueInfo();
+}
+
+function updateQueueInfo() {
+  const el=document.getElementById('live-queue-info');
+  el.textContent=liveQueue.length>0?`${liveQueue.length} messagg${liveQueue.length>1?'i':'io'} in coda`:'';
+}
+
+function spawnParticles() {
+  const container=document.getElementById('particles');
+  container.innerHTML='';
+  const color=settings.accentColor;
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const size=3+Math.random()*5;
+    p.style.cssText=`width:${size}px;height:${size}px;left:${10+Math.random()*80}%;bottom:${Math.random()*20}%;background:${Math.random()>.5?color:color+'99'};animation-duration:${4+Math.random()*5}s;animation-delay:${Math.random()*2}s;`;
+    container.appendChild(p);
+  }
+}
+</script>
+</body>
+</html>
