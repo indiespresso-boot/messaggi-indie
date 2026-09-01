@@ -192,7 +192,7 @@ function renderList(id, items, isPending) {
   c.innerHTML = items.map(m=>`
     <div class="msg-card ${m.status}">
       <div class="msg-avatar" style="background:linear-gradient(135deg,${settings.accentColor},${lighten(settings.accentColor)})">${initials(m.nome||'?')}</div>
-      ${m.photoURL ? `<img class="msg-photo" src="${m.photoURL}" alt="selfie" onclick="openModal('${m.photoURL}')">` : ''}
+      ${m.photo ? `<img class="msg-photo" src="${m.photo}" alt="selfie" onclick="openModal('${m.photo}')">` : ''}
       <div class="msg-body">
         <div class="msg-sender">
           <strong>${m.nome?escHtml(m.nome):'<em style="font-weight:400;color:var(--muted2)">Anonimo</em>'}</strong>

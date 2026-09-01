@@ -31,41 +31,18 @@ body::before { content:''; position:fixed; inset:0; background:radial-gradient(e
 .f-charcount { font-size:10px; color:var(--muted2); }
 .f-charcount span { color:var(--accent); }
 .f-charcount.warn span { color:var(--accent2); }
-
-/* SELFIE */
 .selfie-section { margin-bottom:16px; }
-.btn-selfie {
-  width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
-  background:rgba(255,255,255,.04); border:1px dashed var(--border); border-radius:11px;
-  padding:13px 14px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px;
-  cursor:pointer; transition:all .2s;
-}
+.btn-selfie { width:100%; display:flex; align-items:center; justify-content:center; gap:10px; background:rgba(255,255,255,.04); border:1px dashed var(--border); border-radius:11px; padding:13px 14px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:all .2s; }
 .btn-selfie:hover { border-color:var(--accent); color:var(--accent); background:rgba(232,255,71,.04); }
 .btn-selfie.has-photo { border-style:solid; border-color:rgba(77,255,145,.4); color:var(--green); background:rgba(77,255,145,.04); }
-.selfie-preview-wrap {
-  position:relative; margin-top:10px; display:none;
-}
-.selfie-preview {
-  width:100%; max-height:180px; object-fit:cover; border-radius:10px;
-  border:1px solid var(--border); display:block;
-}
-.btn-remove-photo {
-  position:absolute; top:7px; right:7px;
-  background:rgba(0,0,0,.7); border:1px solid rgba(255,255,255,.15);
-  border-radius:50%; width:26px; height:26px;
-  color:#fff; font-size:13px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  transition:background .15s;
-}
+.selfie-preview-wrap { position:relative; margin-top:10px; display:none; }
+.selfie-preview { width:100%; max-height:180px; object-fit:cover; border-radius:10px; border:1px solid var(--border); display:block; }
+.btn-remove-photo { position:absolute; top:7px; right:7px; background:rgba(0,0,0,.7); border:1px solid rgba(255,255,255,.15); border-radius:50%; width:26px; height:26px; color:#fff; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .btn-remove-photo:hover { background:rgba(255,77,109,.7); }
-
-/* SEND */
 .btn-send { width:100%; background:var(--accent); color:#0a0a0a; font-family:'Syne',sans-serif; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; border:none; border-radius:12px; padding:15px; cursor:pointer; transition:transform .15s,opacity .15s; display:flex; align-items:center; justify-content:center; gap:8px; }
 .btn-send:hover { transform:translateY(-1px); opacity:.92; }
 .btn-send:disabled { opacity:.4; cursor:not-allowed; transform:none; }
 .f-privacy { font-size:10px; color:var(--muted2); text-align:center; margin-top:10px; line-height:1.5; }
-
-/* SUCCESS */
 .form-success { display:none; flex-direction:column; align-items:center; text-align:center; padding:20px 0 10px; gap:12px; }
 .success-icon { font-size:40px; animation:pop-in .4s cubic-bezier(.34,1.56,.64,1); }
 .success-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--text); }
@@ -90,7 +67,6 @@ body::before { content:''; position:fixed; inset:0; background:radial-gradient(e
       <div class="f-charcount" id="charcount"><span>0</span> / 140</div>
     </div>
 
-    <!-- SELFIE -->
     <div class="selfie-section">
       <label class="f-label">Selfie <em>(opzionale)</em></label>
       <input type="file" id="input-photo" accept="image/*" capture="user" style="display:none">
@@ -98,8 +74,8 @@ body::before { content:''; position:fixed; inset:0; background:radial-gradient(e
         <span>📸</span> Scatta o carica un selfie
       </button>
       <div class="selfie-preview-wrap" id="selfie-preview-wrap">
-        <img class="selfie-preview" id="selfie-preview" src="" alt="Anteprima selfie">
-        <button type="button" class="btn-remove-photo" onclick="removePhoto()" title="Rimuovi foto">✕</button>
+        <img class="selfie-preview" id="selfie-preview" src="" alt="Anteprima">
+        <button type="button" class="btn-remove-photo" onclick="removePhoto()">✕</button>
       </div>
     </div>
 
@@ -118,8 +94,7 @@ body::before { content:''; position:fixed; inset:0; background:radial-gradient(e
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyApLhRbbVD2J84mVLEx8yMHI93U-D-ofQQ",
@@ -131,14 +106,13 @@ const firebaseConfig = {
   appId: "1:955832496076:web:77fdcbd958842f65673769"
 };
 
-const fbApp  = initializeApp(firebaseConfig);
-const db      = getDatabase(fbApp);
-const storage = getStorage(fbApp);
-const msgsRef    = ref(db, 'messages');
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+const msgsRef = ref(db, 'messages');
 const settingsRef = ref(db, 'settings');
 
 let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#e8ff47' };
-let selectedFile = null;
+let photoBase64 = null;
 
 function showToast(msg, type='') {
   const t = document.getElementById('toast');
@@ -146,7 +120,6 @@ function showToast(msg, type='') {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// Sync settings
 onValue(settingsRef, snap => {
   if (snap.exists()) {
     settings = { ...settings, ...snap.val() };
@@ -160,7 +133,6 @@ onValue(settingsRef, snap => {
   }
 });
 
-// Char count
 document.getElementById('input-msg').addEventListener('input', function() {
   const len = this.value.length;
   const cc = document.getElementById('charcount');
@@ -170,28 +142,44 @@ document.getElementById('input-msg').addEventListener('input', function() {
 });
 document.getElementById('btn-send').disabled = true;
 
-// Photo picker
-document.getElementById('input-photo').addEventListener('change', function() {
+// Compress + convert to base64
+function compressToBase64(file) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const MAX = 400; // piccolo per stare nei limiti Firebase
+      let w = img.width, h = img.height;
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+      else { w = Math.round(w * MAX / h); h = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.6));
+    };
+    img.src = url;
+  });
+}
+
+document.getElementById('input-photo').addEventListener('change', async function() {
   const file = this.files[0];
   if (!file) return;
-  if (file.size > 8 * 1024 * 1024) {
-    showToast('⚠ Foto troppo grande (max 8MB)', 'error');
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('⚠ Foto troppo grande (max 10MB)', 'error');
     return;
   }
-  selectedFile = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('selfie-preview').src = e.target.result;
-    document.getElementById('selfie-preview-wrap').style.display = 'block';
-    const btn = document.getElementById('btn-selfie');
-    btn.classList.add('has-photo');
-    btn.innerHTML = '<span>✅</span> Selfie aggiunto';
-  };
-  reader.readAsDataURL(file);
+  const btn = document.getElementById('btn-selfie');
+  btn.innerHTML = '<span>⏳</span> Elaborazione…';
+  photoBase64 = await compressToBase64(file);
+  document.getElementById('selfie-preview').src = photoBase64;
+  document.getElementById('selfie-preview-wrap').style.display = 'block';
+  btn.classList.add('has-photo');
+  btn.innerHTML = '<span>✅</span> Selfie aggiunto';
 });
 
 window.removePhoto = function() {
-  selectedFile = null;
+  photoBase64 = null;
   document.getElementById('input-photo').value = '';
   document.getElementById('selfie-preview').src = '';
   document.getElementById('selfie-preview-wrap').style.display = 'none';
@@ -200,61 +188,23 @@ window.removePhoto = function() {
   btn.innerHTML = '<span>📸</span> Scatta o carica un selfie';
 };
 
-// Compress image before upload (max 800px, quality 0.75)
-async function compressImage(file) {
-  return new Promise(resolve => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      const MAX = 800;
-      let w = img.width, h = img.height;
-      if (w > MAX || h > MAX) {
-        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-        else { w = Math.round(w * MAX / h); h = MAX; }
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      canvas.toBlob(blob => { URL.revokeObjectURL(url); resolve(blob); }, 'image/jpeg', 0.75);
-    };
-    img.src = url;
-  });
-}
-
 window.submitMsg = async function() {
   const nome = document.getElementById('input-nome').value.trim();
   const msg  = document.getElementById('input-msg').value.trim();
   if (!msg) return;
-
   const btn = document.getElementById('btn-send');
   btn.disabled = true;
-  btn.innerHTML = selectedFile ? 'Caricamento foto…' : 'Invio…';
-
+  btn.innerHTML = 'Invio…';
   try {
-    let photoURL = null;
-
-    // Upload foto se presente
-    if (selectedFile) {
-      btn.innerHTML = 'Caricamento foto…';
-      const compressed = await compressImage(selectedFile);
-      const filename = `selfie/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
-      const photoRef = sRef(storage, filename);
-      await uploadBytes(photoRef, compressed);
-      photoURL = await getDownloadURL(photoRef);
-    }
-
-    btn.innerHTML = 'Invio…';
     await push(msgsRef, {
       nome: nome || null,
       msg,
       ts: Date.now(),
       status: 'pending',
-      photoURL: photoURL || null
+      photo: photoBase64 || null
     });
-
     document.getElementById('form-body').style.display = 'none';
     document.getElementById('form-success').style.display = 'flex';
-
   } catch(e) {
     console.error(e);
     showToast('⚠ Errore di connessione', 'error');
