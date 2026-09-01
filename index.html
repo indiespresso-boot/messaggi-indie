@@ -148,7 +148,7 @@ function compressToBase64(file) {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
-      const MAX = 400; // piccolo per stare nei limiti Firebase
+      const MAX = 300;
       let w = img.width, h = img.height;
       if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
       else { w = Math.round(w * MAX / h); h = MAX; }
@@ -156,7 +156,7 @@ function compressToBase64(file) {
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       URL.revokeObjectURL(url);
-      resolve(canvas.toDataURL('image/jpeg', 0.6));
+      resolve(canvas.toDataURL('image/jpeg', 0.4));
     };
     img.src = url;
   });
@@ -196,18 +196,28 @@ window.submitMsg = async function() {
   btn.disabled = true;
   btn.innerHTML = 'Invio…';
   try {
-    await push(msgsRef, {
+    // Stima dimensione payload
+    const payload = {
       nome: nome || null,
       msg,
       ts: Date.now(),
       status: 'pending',
       photo: photoBase64 || null
-    });
+    };
+    const size = JSON.stringify(payload).length;
+    console.log('Payload size:', Math.round(size/1024), 'KB');
+    if (size > 9 * 1024 * 1024) {
+      showToast('⚠ Foto troppo grande, riprovaci senza', 'error');
+      btn.disabled = false;
+      btn.innerHTML = 'Invia messaggio <span>→</span>';
+      return;
+    }
+    await push(msgsRef, payload);
     document.getElementById('form-body').style.display = 'none';
     document.getElementById('form-success').style.display = 'flex';
   } catch(e) {
     console.error(e);
-    showToast('⚠ Errore di connessione', 'error');
+    showToast('⚠ Errore: ' + (e.message||'connessione'), 'error');
     btn.disabled = false;
     btn.innerHTML = 'Invia messaggio <span>→</span>';
   }
