@@ -34,12 +34,20 @@ body { display:flex; align-items:center; justify-content:center; min-height:100v
 .live-event-label::before,.live-event-label::after { content:''; height:1px; width:40px; background:currentColor; opacity:.4; }
 .live-event-name-display { font-family:'Syne',sans-serif; font-size:clamp(28px,5vw,52px); font-weight:900; letter-spacing:-.04em; line-height:1; margin-bottom:48px; transition:color .5s; }
 .dedica-container { min-height:220px; display:flex; align-items:center; justify-content:center; }
-.dedica-box { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:24px; padding:44px 52px; max-width:780px; width:100%; backdrop-filter:blur(10px); position:relative; overflow:hidden; }
+.dedica-box { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:24px; padding:44px 52px; max-width:860px; width:100%; backdrop-filter:blur(10px); position:relative; overflow:hidden; }
 .dedica-box::before { content:'\275D'; position:absolute; top:12px;left:24px; font-size:60px; opacity:.08; font-family:Georgia,serif; line-height:1; }
 .dedica-waiting { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:rgba(255,255,255,.2); letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; gap:12px; justify-content:center; }
 .dedica-waiting::before { content:''; width:8px;height:8px; border-radius:50%; background:rgba(255,255,255,.2); animation:pulse-dot 2s infinite; }
+/* layout con foto */
+.dedica-inner { display:flex; align-items:center; gap:40px; }
+.dedica-photo-wrap { flex-shrink:0; }
+.dedica-photo { width:160px; height:160px; border-radius:16px; object-fit:cover; border:2px solid rgba(255,255,255,.15); box-shadow:0 8px 32px rgba(0,0,0,.5); animation:fade-up .6s cubic-bezier(.22,1,.36,1); }
+.dedica-txt-wrap { flex:1; text-align:left; }
 .dedica-text { font-family:'DM Sans',sans-serif; font-size:clamp(18px,3vw,28px); font-weight:300; font-style:italic; line-height:1.45; color:var(--text); margin-bottom:28px; animation:fade-up .6s cubic-bezier(.22,1,.36,1); }
 .dedica-sender { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); animation:fade-up .6s .15s cubic-bezier(.22,1,.36,1) both; }
+/* senza foto: centra il testo come prima */
+.dedica-inner.no-photo { justify-content:center; }
+.dedica-inner.no-photo .dedica-txt-wrap { text-align:center; }
 .live-queue-info { position:absolute; bottom:24px; left:50%; transform:translateX(-50%); z-index:20; font-size:11px; color:rgba(255,255,255,.25); font-family:'Syne',sans-serif; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
 .live-transition { position:absolute; inset:0; z-index:50; background:var(--deep); opacity:0; pointer-events:none; transition:opacity .3s; }
 .live-transition.flash { opacity:1; }</style>
@@ -58,8 +66,15 @@ body { display:flex; align-items:center; justify-content:center; min-height:100v
     <div class="dedica-box">
       <div class="dedica-waiting" id="dedica-waiting">In attesa di messaggi</div>
       <div style="display:none" id="dedica-content">
-        <div class="dedica-text" id="dedica-text"></div>
-        <div class="dedica-sender" id="dedica-sender"></div>
+        <div class="dedica-inner" id="dedica-inner">
+          <div class="dedica-photo-wrap" id="dedica-photo-wrap" style="display:none">
+            <img class="dedica-photo" id="dedica-photo" src="" alt="selfie">
+          </div>
+          <div class="dedica-txt-wrap">
+            <div class="dedica-text" id="dedica-text"></div>
+            <div class="dedica-sender" id="dedica-sender"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -142,12 +157,24 @@ function renderMsg(msg) {
   document.getElementById('dedica-waiting').style.display='none';
   document.getElementById('dedica-content').style.display='block';
   const dt=document.getElementById('dedica-text'), ds=document.getElementById('dedica-sender');
+  const photoWrap=document.getElementById('dedica-photo-wrap');
+  const photoImg=document.getElementById('dedica-photo');
+  const inner=document.getElementById('dedica-inner');
   dt.style.animation='none'; ds.style.animation='none';
   void dt.offsetWidth; void ds.offsetWidth;
   dt.style.animation=''; ds.style.animation='';
   dt.textContent = msg.msg;
   ds.textContent = msg.nome ? '— '+msg.nome : '— Anonimo';
   ds.style.color = settings.accentColor;
+  // foto
+  if(msg.photoURL) {
+    photoImg.src = msg.photoURL;
+    photoWrap.style.display = 'block';
+    inner.className = 'dedica-inner';
+  } else {
+    photoWrap.style.display = 'none';
+    inner.className = 'dedica-inner no-photo';
+  }
   spawnParticles();
 }
 
