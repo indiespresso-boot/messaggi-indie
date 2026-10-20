@@ -140,7 +140,10 @@ function showToast(msg, type='') {
 onValue(settingsRef, snap => {
   if (snap.exists()) {
     settings = { ...settings, ...snap.val() };
-    const color = settings.accentColor;
+    // Valida che il colore sia un hex valido, altrimenti usa il default giallo
+    const raw = settings.accentColor || '#e8ff47';
+    const color = /^#[0-9a-fA-F]{6}$/.test(raw) ? raw : '#e8ff47';
+    settings.accentColor = color;
     const parts = settings.eventName.trim().split(' '), last = parts.pop(), rest = parts.join(' ');
     const el = document.getElementById('pub-event-name');
     if (el) el.innerHTML = (rest ? rest+' ' : '') + `<span style="color:${color}">${last}</span>`;
@@ -157,6 +160,8 @@ document.getElementById('input-msg').addEventListener('input', function() {
   cc.className = 'f-charcount' + (len > 120 ? ' warn' : '');
   updateSendBtn();
 });
+// Aggiorna subito il pulsante (attivo se c'è msg OPPURE foto)
+
 
 // ── SELFIE ──────────────────────────────────────────────────
 
@@ -238,9 +243,11 @@ function isUploading() {
 
 function updateSendBtn() {
   const hasMsg = document.getElementById('input-msg').value.trim().length > 0;
+  const hasPhoto = selfieUploaded !== null || (selfieDataURL !== null);
   const uploading = isUploading();
   const btn = document.getElementById('btn-send');
-  btn.disabled = !hasMsg || uploading;
+  // Abilitato se c'è almeno un messaggio OPPURE una foto (non mentre carica)
+  btn.disabled = (!hasMsg && !hasPhoto) || uploading;
   if (uploading) {
     btn.innerHTML = 'Attendere foto… <div class="spinner" style="width:14px;height:14px;border-width:2px;border-color:rgba(0,0,0,.3);border-top-color:#0a0a0a"></div>';
   } else {
@@ -255,13 +262,13 @@ document.getElementById('btn-send').disabled = true;
 window.submitMsg = async function() {
   const nome = document.getElementById('input-nome').value.trim();
   const msg  = document.getElementById('input-msg').value.trim();
-  if (!msg) return;
+  if (!msg && !selfieUploaded) return;
   if (isUploading()) { showToast('Attendere il caricamento della foto…'); return; }
 
   const btn = document.getElementById('btn-send');
   btn.disabled = true; btn.textContent = 'Invio…';
   try {
-    const record = { nome: nome||null, msg, ts: Date.now(), status: 'pending' };
+    const record = { nome: nome||null, msg: msg||'', ts: Date.now(), status: 'pending' };
     if (selfieUploaded) record.photoURL = selfieUploaded;
     await push(msgsRef, record);
     document.getElementById('form-body').style.display = 'none';

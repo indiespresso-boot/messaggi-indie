@@ -39,9 +39,9 @@ body { display:flex; align-items:center; justify-content:center; min-height:100v
 .dedica-waiting { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:rgba(255,255,255,.2); letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; gap:12px; justify-content:center; }
 .dedica-waiting::before { content:''; width:8px;height:8px; border-radius:50%; background:rgba(255,255,255,.2); animation:pulse-dot 2s infinite; }
 /* layout con foto */
-.dedica-inner { display:flex; align-items:center; gap:40px; }
-.dedica-photo-wrap { flex-shrink:0; }
-.dedica-photo { width:160px; height:160px; border-radius:16px; object-fit:cover; border:2px solid rgba(255,255,255,.15); box-shadow:0 8px 32px rgba(0,0,0,.5); animation:fade-up .6s cubic-bezier(.22,1,.36,1); }
+.dedica-inner { display:flex; align-items:center; gap:48px; }
+.dedica-photo-wrap { flex-shrink:0; max-width:42%; }
+.dedica-photo { display:block; max-width:100%; max-height:72vh; border-radius:18px; object-fit:contain; border:2px solid rgba(255,255,255,.15); box-shadow:0 12px 48px rgba(0,0,0,.6); animation:fade-up .6s cubic-bezier(.22,1,.36,1); }
 .dedica-txt-wrap { flex:1; text-align:left; }
 .dedica-text { font-family:'DM Sans',sans-serif; font-size:clamp(18px,3vw,28px); font-weight:300; font-style:italic; line-height:1.45; color:var(--text); margin-bottom:28px; animation:fade-up .6s cubic-bezier(.22,1,.36,1); }
 .dedica-sender { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); animation:fade-up .6s .15s cubic-bezier(.22,1,.36,1) both; }
@@ -114,7 +114,9 @@ let displayTimer = null;
 onValue(settingsRef, snap => {
   if(snap.exists()) {
     settings = {...settings,...snap.val()};
-    const c = settings.accentColor;
+    const raw = settings.accentColor || '#e8ff47';
+    const c = /^#[0-9a-fA-F]{6}$/.test(raw) ? raw : '#e8ff47';
+    settings.accentColor = c;
     const ne = document.getElementById('live-event-name');
     if(ne) { ne.textContent=settings.eventName; ne.style.color=c; }
     const bg = document.getElementById('live-bg-gradient');
