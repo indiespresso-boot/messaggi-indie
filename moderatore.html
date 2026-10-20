@@ -12,13 +12,10 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 @keyframes pop-in { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
 @keyframes fade-up { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
 @keyframes slide-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-@keyframes scan-line { 0%,100%{opacity:.3} 50%{opacity:.9} }
-@keyframes float-up { 0%{opacity:0;transform:translateY(0) scale(0)} 10%{opacity:.6} 90%{opacity:.2} 100%{opacity:0;transform:translateY(-100vh) scale(1.5)} }
 .toast { position:fixed; bottom:24px;left:50%; transform:translateX(-50%) translateY(80px); background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:12px 20px; font-size:13px; font-weight:500; color:var(--text); z-index:9999; transition:transform .3s cubic-bezier(.34,1.56,.64,1); white-space:nowrap; display:flex; align-items:center; gap:8px; }
 .toast.show { transform:translateX(-50%) translateY(0); }
 .toast.success { border-color:rgba(77,255,145,.3); }
 .toast.error { border-color:rgba(255,77,109,.3); }
-.live-dot { width:7px; height:7px; border-radius:50%; background:var(--accent2); animation:pulse-dot 1.4s ease-in-out infinite; }
 ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 #wrap { padding:28px 24px; max-width:1100px; margin:0 auto; }
 .dash-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:16px; }
@@ -55,7 +52,12 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 .msg-sender strong { color:var(--text); }
 .msg-time { font-size:10px; color:var(--muted2); }
 .msg-text { font-size:14px; color:var(--text); line-height:1.5; }
-.msg-actions { display:flex; gap:8px; flex-shrink:0; margin-top:2px; }
+
+/* ── PHOTO THUMBNAIL ── */
+.msg-photo { width:56px; height:56px; border-radius:9px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; cursor:pointer; transition:opacity .15s,transform .15s; }
+.msg-photo:hover { opacity:.85; transform:scale(1.04); }
+
+.msg-actions { display:flex; gap:8px; flex-shrink:0; margin-top:2px; flex-wrap:wrap; }
 .btn-approve,.btn-reject { padding:7px 16px; border-radius:8px; font-family:'Syne',sans-serif; font-size:11px; font-weight:700; cursor:pointer; border:none; transition:all .15s; }
 .btn-approve { background:rgba(77,255,145,.15); color:var(--green); border:1px solid rgba(77,255,145,.3); }
 .btn-approve:hover { background:rgba(77,255,145,.25); }
@@ -64,7 +66,15 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 .btn-undo { padding:7px 14px; border-radius:8px; font-family:'Syne',sans-serif; font-size:11px; font-weight:700; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); }
 .btn-undo:hover { color:var(--text); border-color:#555; }
 .empty-state { text-align:center; padding:40px 20px; color:var(--muted2); font-size:13px; }
-.empty-state .empty-icon { font-size:28px; margin-bottom:8px; }</style>
+.empty-state .empty-icon { font-size:28px; margin-bottom:8px; }
+
+/* ── LIGHTBOX ── */
+.lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:9998; align-items:center; justify-content:center; padding:20px; cursor:pointer; }
+.lightbox.open { display:flex; animation:pop-in .2s ease; }
+.lightbox img { max-width:92vw; max-height:88vh; border-radius:14px; object-fit:contain; box-shadow:0 30px 80px rgba(0,0,0,.6); cursor:default; }
+.lightbox-close { position:absolute; top:20px; right:24px; font-size:28px; color:rgba(255,255,255,.6); cursor:pointer; line-height:1; }
+.lightbox-close:hover { color:#fff; }
+</style>
 </head>
 <body>
 <div id="wrap">
@@ -115,6 +125,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-close" onclick="document.getElementById('lightbox').classList.remove('open')">✕</div>
+  <img id="lightbox-img" src="" alt="foto">
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -134,7 +151,6 @@ const settingsRef = ref(db, 'settings');
 let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#e8ff47', duration: 8 };
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function lighten(hex) { let c=hex.replace('#',''); let r=Math.min(255,parseInt(c.slice(0,2),16)+60).toString(16).padStart(2,'0'); let g=Math.min(255,parseInt(c.slice(2,4),16)+60).toString(16).padStart(2,'0'); let b=Math.min(255,parseInt(c.slice(4,6),16)+60).toString(16).padStart(2,'0'); return '#'+r+g+b; }
-function hexToRgba(hex,alpha) { hex=hex.replace('#',''); return `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},${alpha})`; }
 function initials(name) { if(!name||!name.trim()) return '?'; const p=name.trim().split(' '); return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():name.slice(0,2).toUpperCase(); }
 function fmtTime(ts) { const d=new Date(ts); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
 function showToast(msg,type='') { const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+type; setTimeout(()=>t.classList.remove('show'),2800); }
@@ -178,23 +194,30 @@ function renderList(id, items, isPending) {
     c.innerHTML = `<div class="empty-state"><div class="empty-icon">${isPending?'📭':'✅'}</div>${isPending?'Nessun messaggio in attesa':'Nessun messaggio approvato ancora'}</div>`;
     return;
   }
-  c.innerHTML = items.map(m=>`
+  c.innerHTML = items.map(m=>{
+    const photoHTML = m.photoURL
+      ? `<img class="msg-photo" src="${escHtml(m.photoURL)}" alt="selfie" onclick="openLightbox('${escHtml(m.photoURL)}')">`
+      : '';
+    return `
     <div class="msg-card ${m.status}">
       <div class="msg-avatar" style="background:linear-gradient(135deg,${settings.accentColor},${lighten(settings.accentColor)})">${initials(m.nome||'?')}</div>
       <div class="msg-body">
         <div class="msg-sender">
           <strong>${m.nome?escHtml(m.nome):'<em style="font-weight:400;color:var(--muted2)">Anonimo</em>'}</strong>
           <span class="msg-time">${fmtTime(m.ts)}</span>
+          ${m.photoURL ? '<span style="font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:1px 6px;">📷 foto</span>' : ''}
         </div>
         <div class="msg-text">${escHtml(m.msg)}</div>
       </div>
+      ${photoHTML}
       <div class="msg-actions">
         ${isPending
           ?`<button class="btn-approve" onclick="approveMsg('${m.fbKey}')">✓ Approva</button>
             <button class="btn-reject"  onclick="rejectMsg('${m.fbKey}')">✕ Rifiuta</button>`
           :`<button class="btn-undo" onclick="undoMsg('${m.fbKey}')">↩ Annulla</button>`}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 window.approveMsg = async k => { await update(ref(db,'messages/'+k),{status:'approved'}); showToast('✓ Approvato','success'); };
@@ -212,6 +235,20 @@ window.applySettings = function() {
   set(settingsRef, settings);
   showToast('✓ Impostazioni applicate','success');
 };
+
+// ── Lightbox ──
+window.openLightbox = function(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox').classList.add('open');
+};
+window.closeLightbox = function(e) {
+  if(e.target === document.getElementById('lightbox')) {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+};
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape') document.getElementById('lightbox').classList.remove('open');
+});
 </script>
 </body>
 </html>
