@@ -6,7 +6,7 @@
 <title>Live — Messaggi Indie</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,wght@0,300;0,400&display=swap" rel="stylesheet">
 <style>* { margin:0; padding:0; box-sizing:border-box; }
-:root { --deep:#0d0d14; --card:#16161f; --card2:#1c1c28; --border:#2a2a3a; --accent:#e8ff47; --accent2:#ff4d6d; --green:#4dff91; --text:#f0f0f0; --muted:#6b6b7e; --muted2:#4a4a5e; }
+:root { --deep:#05091a; --card:#0c1330; --card2:#111d40; --border:#1e2d5a; --accent:#ff6d1f; --accent2:#ff9a52; --green:#4dff91; --text:#ffffff; --muted:#7a8ab0; --muted2:#3d4f7a; }
 body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--text); min-height:100vh; }
 @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
 @keyframes pop-in { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
@@ -18,23 +18,23 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 .toast.show { transform:translateX(-50%) translateY(0); }
 .toast.success { border-color:rgba(77,255,145,.3); }
 .toast.error { border-color:rgba(255,77,109,.3); }
-.live-dot { width:7px; height:7px; border-radius:50%; background:var(--accent2); animation:pulse-dot 1.4s ease-in-out infinite; }
+.live-dot { width:7px; height:7px; border-radius:50%; background:#ff6d1f; animation:pulse-dot 1.4s ease-in-out infinite; }
 ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 body { display:flex; align-items:center; justify-content:center; min-height:100vh; overflow:hidden; position:relative; }
-.live-bg { position:absolute; inset:0; background:#0a0a0f; z-index:0; }
+.live-bg { position:absolute; inset:0; background:#05091a; z-index:0; }
 .live-bg-gradient { position:absolute; inset:0; z-index:1; transition:background 1s; }
 .particles { position:absolute; inset:0; z-index:2; overflow:hidden; pointer-events:none; }
 .particle { position:absolute; border-radius:50%; opacity:0; animation:float-up linear infinite; }
 .live-line { position:absolute; z-index:2; }
 .live-line-top { top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,transparent,var(--accent),transparent); animation:scan-line 3s ease-in-out infinite; }
 .live-line-bot { bottom:0;left:0;right:0;height:3px; background:linear-gradient(90deg,transparent,var(--accent2),transparent); animation:scan-line 3s ease-in-out infinite reverse; }
-.live-corner { position:absolute; top:20px;right:24px; z-index:20; display:flex; align-items:center; gap:7px; font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--accent2); background:rgba(255,77,109,.1); border:1px solid rgba(255,77,109,.3); border-radius:20px; padding:5px 12px; }
+.live-corner { position:absolute; top:20px;right:24px; z-index:20; display:flex; align-items:center; gap:7px; font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:.1em; color:#ff6d1f; background:rgba(255,109,31,.12); border:1px solid rgba(255,109,31,.35); border-radius:20px; padding:5px 12px; }
 .live-content { position:relative; z-index:10; width:100%; max-width:900px; padding:60px 40px; text-align:center; }
 .live-event-label { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); opacity:.8; margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:10px; }
 .live-event-label::before,.live-event-label::after { content:''; height:1px; width:40px; background:currentColor; opacity:.4; }
 .live-event-name-display { font-family:'Syne',sans-serif; font-size:clamp(28px,5vw,52px); font-weight:900; letter-spacing:-.04em; line-height:1; margin-bottom:48px; transition:color .5s; }
 .dedica-container { min-height:220px; display:flex; align-items:center; justify-content:center; }
-.dedica-box { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:24px; padding:44px 52px; max-width:860px; width:100%; backdrop-filter:blur(10px); position:relative; overflow:hidden; }
+.dedica-box { background:rgba(12,19,48,.7); border:1px solid rgba(255,109,31,.18); border-radius:24px; padding:44px 52px; max-width:860px; width:100%; backdrop-filter:blur(12px); position:relative; overflow:hidden; }
 .dedica-box::before { content:'\275D'; position:absolute; top:12px;left:24px; font-size:60px; opacity:.08; font-family:Georgia,serif; line-height:1; }
 .dedica-waiting { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:rgba(255,255,255,.2); letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; gap:12px; justify-content:center; }
 .dedica-waiting::before { content:''; width:8px;height:8px; border-radius:50%; background:rgba(255,255,255,.2); animation:pulse-dot 2s infinite; }
@@ -98,7 +98,7 @@ const fbApp = initializeApp(firebaseConfig);
 const db = getDatabase(fbApp);
 const msgsRef = ref(db, 'messages');
 const settingsRef = ref(db, 'settings');
-let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#e8ff47', duration: 8 };
+let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#ff6d1f', duration: 8 };
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function lighten(hex) { let c=hex.replace('#',''); let r=Math.min(255,parseInt(c.slice(0,2),16)+60).toString(16).padStart(2,'0'); let g=Math.min(255,parseInt(c.slice(2,4),16)+60).toString(16).padStart(2,'0'); let b=Math.min(255,parseInt(c.slice(4,6),16)+60).toString(16).padStart(2,'0'); return '#'+r+g+b; }
 function hexToRgba(hex,alpha) { hex=hex.replace('#',''); return `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},${alpha})`; }
@@ -114,13 +114,13 @@ let displayTimer = null;
 onValue(settingsRef, snap => {
   if(snap.exists()) {
     settings = {...settings,...snap.val()};
-    const raw = settings.accentColor || '#e8ff47';
-    const c = /^#[0-9a-fA-F]{6}$/.test(raw) ? raw : '#e8ff47';
+    const raw = settings.accentColor || '#ff6d1f';
+    const c = /^#[0-9a-fA-F]{6}$/.test(raw) ? raw : '#ff6d1f';
     settings.accentColor = c;
     const ne = document.getElementById('live-event-name');
     if(ne) { ne.textContent=settings.eventName; ne.style.color=c; }
     const bg = document.getElementById('live-bg-gradient');
-    if(bg) bg.style.background=`radial-gradient(ellipse 70% 60% at 50% 50%,${hexToRgba(c,.06)} 0%,transparent 70%)`;
+    if(bg) bg.style.background=`radial-gradient(ellipse 80% 50% at 10% 0%,rgba(30,60,160,.3) 0%,transparent 55%),radial-gradient(ellipse 60% 60% at 90% 100%,${hexToRgba(c,.15)} 0%,transparent 60%)`;
     document.querySelectorAll('.live-line-top').forEach(el=>el.style.background=`linear-gradient(90deg,transparent,${c},transparent)`);
     document.documentElement.style.setProperty('--accent',c);
   }

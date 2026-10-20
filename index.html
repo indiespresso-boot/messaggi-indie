@@ -7,25 +7,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-:root { --deep:#0d0d14; --card:#16161f; --card2:#1c1c28; --border:#2a2a3a; --accent:#e8ff47; --accent2:#ff4d6d; --green:#4dff91; --text:#f0f0f0; --muted:#6b6b7e; --muted2:#4a4a5e; }
+:root {
+  --deep:#f5f5f0;
+  --card:#ffffff;
+  --card2:#f0f0ea;
+  --border:#e0ddd5;
+  --accent:#ff6d1f;
+  --accent2:#e05510;
+  --green:#1a9e5c;
+  --text:#111111;
+  --muted:#888880;
+  --muted2:#b0afa8;
+}
 body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 20px; position:relative; overflow:hidden; }
-body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse 60% 40% at 15% 10%,rgba(232,255,71,.055) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 85% 90%,rgba(255,77,109,.06) 0%,transparent 60%); pointer-events:none; }
+body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse 60% 40% at 10% 0%,rgba(255,109,31,.07) 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 90% 100%,rgba(255,109,31,.05) 0%,transparent 55%); pointer-events:none; }
 @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
 @keyframes pop-in { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
 @keyframes spin { to{transform:rotate(360deg)} }
-.toast { position:fixed; bottom:24px;left:50%; transform:translateX(-50%) translateY(80px); background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:12px 20px; font-size:13px; font-weight:500; color:var(--text); z-index:9999; transition:transform .3s cubic-bezier(.34,1.56,.64,1); white-space:nowrap; }
+.toast { position:fixed; bottom:24px;left:50%; transform:translateX(-50%) translateY(80px); background:#111111; border:1px solid #333; border-radius:12px; padding:12px 20px; font-size:13px; font-weight:500; color:#fff; z-index:9999; transition:transform .3s cubic-bezier(.34,1.56,.64,1); white-space:nowrap; }
 .toast.show { transform:translateX(-50%) translateY(0); }
-.toast.success { border-color:rgba(77,255,145,.3); }
-.toast.error { border-color:rgba(255,77,109,.3); }
-.form-card { width:100%; max-width:400px; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:32px 28px 28px; }
-.form-event-tag { display:inline-flex; align-items:center; gap:6px; font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); background:rgba(232,255,71,.09); border:1px solid rgba(232,255,71,.22); border-radius:20px; padding:4px 12px; margin-bottom:14px; }
+.toast.success { border-color:rgba(26,158,92,.5); }
+.toast.error { border-color:rgba(224,85,16,.5); }
+.form-card { width:100%; max-width:400px; background:var(--card); border:1px solid var(--border); border-radius:24px; padding:32px 28px 28px; box-shadow:0 4px 32px rgba(0,0,0,.08); }
+.form-event-tag { display:inline-flex; align-items:center; gap:6px; font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); background:rgba(255,109,31,.08); border:1px solid rgba(255,109,31,.25); border-radius:20px; padding:4px 12px; margin-bottom:14px; }
 .form-event-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse-dot 1.4s ease-in-out infinite; }
 .form-event-name { font-family:'Syne',sans-serif; font-size:22px; font-weight:900; color:var(--text); line-height:1.1; letter-spacing:-.03em; margin-bottom:4px; }
 .form-event-sub { font-size:12px; color:var(--muted); margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid var(--border); }
 .f-label { font-size:10px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; display:flex; align-items:center; gap:6px; }
 .f-label em { font-style:normal; font-weight:400; text-transform:none; letter-spacing:0; color:var(--muted2); font-size:10px; }
-.f-input { width:100%; background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:11px; padding:12px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; margin-bottom:16px; transition:border-color .2s,background .2s; resize:none; }
-.f-input:focus { border-color:rgba(232,255,71,.5); background:rgba(232,255,71,.025); }
+.f-input { width:100%; background:#faf9f7; border:1px solid var(--border); border-radius:11px; padding:12px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; margin-bottom:16px; transition:border-color .2s,background .2s; resize:none; }
+.f-input:focus { border-color:rgba(255,109,31,.5); background:rgba(255,109,31,.04); }
 .f-input::placeholder { color:var(--muted2); }
 .f-textarea { height:120px; line-height:1.55; }
 .f-meta { display:flex; justify-content:flex-end; margin-top:-10px; margin-bottom:20px; }
@@ -37,18 +48,18 @@ body::before { content:''; position:fixed; inset:0; background:radial-gradient(e
 .selfie-section { margin-bottom:20px; }
 .selfie-label { font-size:10px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
 .selfie-label em { font-style:normal; font-weight:400; text-transform:none; letter-spacing:0; color:var(--muted2); font-size:10px; }
-.selfie-trigger { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:13px 16px; background:rgba(255,255,255,.04); border:1px dashed var(--border); border-radius:11px; cursor:pointer; transition:all .2s; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; }
-.selfie-trigger:hover { border-color:rgba(232,255,71,.4); color:var(--accent); background:rgba(232,255,71,.04); }
+.selfie-trigger { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:13px 16px; background:#faf9f7; border:1px dashed var(--border); border-radius:11px; cursor:pointer; transition:all .2s; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; }
+.selfie-trigger:hover { border-color:rgba(255,109,31,.4); color:var(--accent); background:rgba(255,109,31,.06); }
 .selfie-trigger svg { flex-shrink:0; opacity:.7; }
 #selfie-input { display:none; }
 .selfie-preview-wrap { position:relative; display:none; margin-top:0; }
-.selfie-preview { width:100%; height:180px; object-fit:cover; border-radius:11px; border:1px solid rgba(232,255,71,.3); display:block; }
+.selfie-preview { width:100%; height:180px; object-fit:cover; border-radius:11px; border:1px solid rgba(255,109,31,.3); display:block; }
 .selfie-remove { position:absolute; top:8px; right:8px; width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,.7); border:1px solid var(--border); color:var(--text); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; }
 .selfie-remove:hover { background:rgba(255,77,109,.5); }
-.selfie-uploading { display:none; align-items:center; justify-content:center; gap:10px; padding:13px; background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:11px; font-size:12px; color:var(--muted); }
+.selfie-uploading { display:none; align-items:center; justify-content:center; gap:10px; padding:13px; background:#faf9f7; border:1px solid var(--border); border-radius:11px; font-size:12px; color:var(--muted); }
 .spinner { width:16px; height:16px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
 
-.btn-send { width:100%; background:var(--accent); color:#0a0a0a; font-family:'Syne',sans-serif; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; border:none; border-radius:12px; padding:15px; cursor:pointer; transition:transform .15s,opacity .15s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-send { width:100%; background:var(--accent); color:#ffffff; font-family:'Syne',sans-serif; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; border:none; border-radius:12px; padding:15px; cursor:pointer; transition:transform .15s,opacity .15s; display:flex; align-items:center; justify-content:center; gap:8px; }
 .btn-send:hover { transform:translateY(-1px); opacity:.92; }
 .btn-send:disabled { opacity:.4; cursor:not-allowed; transform:none; }
 .f-privacy { font-size:10px; color:var(--muted2); text-align:center; margin-top:10px; line-height:1.5; }
@@ -58,6 +69,7 @@ body::before { content:''; position:fixed; inset:0; background:radial-gradient(e
 .success-sub { font-size:13px; color:var(--muted); line-height:1.5; }
 .btn-another { margin-top:8px; padding:10px 24px; background:transparent; border:1px solid var(--border); border-radius:10px; color:var(--muted); font-family:'Syne',sans-serif; font-size:12px; font-weight:700; cursor:pointer; transition:all .18s; }
 .btn-another:hover { border-color:var(--accent); color:var(--accent); }
+/* spinner arancio */
 </style>
 </head>
 <body>
@@ -121,7 +133,7 @@ const fbApp = initializeApp(firebaseConfig);
 const db = getDatabase(fbApp);
 const msgsRef = ref(db, 'messages');
 const settingsRef = ref(db, 'settings');
-let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#e8ff47' };
+let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#ff6d1f' };
 
 // Cloudinary config
 const CLOUDINARY_CLOUD = 's3bknfy8';
@@ -141,8 +153,8 @@ onValue(settingsRef, snap => {
   if (snap.exists()) {
     settings = { ...settings, ...snap.val() };
     // Valida che il colore sia un hex valido, altrimenti usa il default giallo
-    const raw = settings.accentColor || '#e8ff47';
-    const color = /^#[0-9a-fA-F]{6}$/.test(raw) ? raw : '#e8ff47';
+    const raw = settings.accentColor || '#ff6d1f';
+    const color = /^#[0-9a-fA-F]{6}$/.test(raw) ? raw : '#ff6d1f';
     settings.accentColor = color;
     const parts = settings.eventName.trim().split(' '), last = parts.pop(), rest = parts.join(' ');
     const el = document.getElementById('pub-event-name');

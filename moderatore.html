@@ -6,7 +6,7 @@
 <title>Moderatore — Messaggi Indie</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
 <style>* { margin:0; padding:0; box-sizing:border-box; }
-:root { --deep:#0d0d14; --card:#16161f; --card2:#1c1c28; --border:#2a2a3a; --accent:#e8ff47; --accent2:#ff4d6d; --green:#4dff91; --text:#f0f0f0; --muted:#6b6b7e; --muted2:#4a4a5e; }
+:root { --deep:#05091a; --card:#0c1330; --card2:#111d40; --border:#1e2d5a; --accent:#ff6d1f; --accent2:#ff9a52; --green:#4dff91; --text:#ffffff; --muted:#7a8ab0; --muted2:#3d4f7a; }
 body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--text); min-height:100vh; }
 @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
 @keyframes pop-in { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
@@ -36,7 +36,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 .s-input:focus { border-color:rgba(232,255,71,.5); }
 .color-row { display:flex; gap:8px; align-items:center; }
 .s-color { width:36px; height:36px; border-radius:8px; border:2px solid var(--border); cursor:pointer; padding:2px; background:transparent; }
-.btn-apply { padding:10px 20px; background:var(--accent); color:#0a0a0a; font-family:'Syne',sans-serif; font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; border:none; border-radius:9px; cursor:pointer; height:38px; }
+.btn-apply { padding:10px 20px; background:var(--accent); color:#ffffff; font-family:'Syne',sans-serif; font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; border:none; border-radius:9px; cursor:pointer; height:38px; }
 .btn-apply:hover { opacity:.88; }
 .queue-section { margin-bottom:24px; }
 .queue-label { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
@@ -148,7 +148,7 @@ const fbApp = initializeApp(firebaseConfig);
 const db = getDatabase(fbApp);
 const msgsRef = ref(db, 'messages');
 const settingsRef = ref(db, 'settings');
-let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#e8ff47', duration: 8 };
+let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#ff6d1f', duration: 8 };
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function lighten(hex) { let c=hex.replace('#',''); let r=Math.min(255,parseInt(c.slice(0,2),16)+60).toString(16).padStart(2,'0'); let g=Math.min(255,parseInt(c.slice(2,4),16)+60).toString(16).padStart(2,'0'); let b=Math.min(255,parseInt(c.slice(4,6),16)+60).toString(16).padStart(2,'0'); return '#'+r+g+b; }
 function initials(name) { if(!name||!name.trim()) return '?'; const p=name.trim().split(' '); return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():name.slice(0,2).toUpperCase(); }
