@@ -6,7 +6,7 @@
 <title>Moderatore — Messaggi Indie</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
 <style>* { margin:0; padding:0; box-sizing:border-box; }
-:root { --deep:#05091a; --card:#0c1330; --card2:#111d40; --border:#1e2d5a; --accent:#ff6d1f; --accent2:#ff9a52; --green:#4dff91; --text:#ffffff; --muted:#7a8ab0; --muted2:#3d4f7a; }
+:root { --deep:#061212; --card:#0a1e1e; --card2:#0f2828; --border:#1a3838; --accent:#f04e37; --accent2:#c93520; --teal:#1ec8d0; --green:#4dff91; --text:#ffffff; --muted:#6aacac; --muted2:#2a5050; }
 body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--text); min-height:100vh; }
 @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
 @keyframes pop-in { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
@@ -148,7 +148,7 @@ const fbApp = initializeApp(firebaseConfig);
 const db = getDatabase(fbApp);
 const msgsRef = ref(db, 'messages');
 const settingsRef = ref(db, 'settings');
-let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#ff6d1f', duration: 8 };
+let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#f04e37', duration: 8 };
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function lighten(hex) { let c=hex.replace('#',''); let r=Math.min(255,parseInt(c.slice(0,2),16)+60).toString(16).padStart(2,'0'); let g=Math.min(255,parseInt(c.slice(2,4),16)+60).toString(16).padStart(2,'0'); let b=Math.min(255,parseInt(c.slice(4,6),16)+60).toString(16).padStart(2,'0'); return '#'+r+g+b; }
 function initials(name) { if(!name||!name.trim()) return '?'; const p=name.trim().split(' '); return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():name.slice(0,2).toUpperCase(); }
