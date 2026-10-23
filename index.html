@@ -206,8 +206,8 @@ document.getElementById('selfie-input').addEventListener('change', async functio
   document.getElementById('selfie-preview-wrap').style.display = 'block';
   document.getElementById('selfie-trigger').style.display = 'none';
 
-  // Upload to Cloudinary immediately (in background)
-  uploadToCloudinary(selfieDataURL);
+  // Upload to Cloudinary immediately (in background) — file originale per massima qualità
+  uploadToCloudinary(selfieDataURL, file);
 });
 
 async function compressImage(file, maxPx, quality) {
