@@ -198,8 +198,8 @@ document.getElementById('selfie-input').addEventListener('change', async functio
   if (!file) return;
   selfieUploaded = null;
 
-  // Compress via Canvas (max 700px, quality 0.78)
-  selfieDataURL = await compressImage(file, 700, 0.78);
+  // Compress via Canvas (max 1400px, quality 0.88)
+  selfieDataURL = await compressImage(file, 1400, 0.88);
 
   // Show preview
   document.getElementById('selfie-preview').src = selfieDataURL;
