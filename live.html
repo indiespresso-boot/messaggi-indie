@@ -35,8 +35,10 @@ body { display:flex; align-items:center; justify-content:center; min-height:100v
 #live-logo-wrap.hidden { opacity:0; pointer-events:none; }
 
 /* ── AZIONI INSTAGRAM ── */
-.ig-actions { width:100%; display:flex; align-items:center; gap:20px; padding:14px 20px 16px;
-  background:#ffffff; border-top:1px solid #f0f0f0; }
+.ig-actions { width:100%; display:flex; align-items:center; gap:20px; padding:14px 20px 16px; background:#ffffff; border-top:1px solid #f0f0f0; box-sizing:border-box; border-radius:0 0 22px 22px; }
+.dedica-box.has-photo:not(.no-caption) .ig-actions { border-radius:0; }
+.dedica-box.has-photo:not(.no-caption) .ig-caption { border-radius:0; }
+.dedica-box.has-photo:not(.no-caption) .ig-actions:last-child { border-radius:0 0 22px 22px; }
 .ig-action-btn { display:flex; align-items:center; gap:7px; background:none; border:none;
   cursor:default; padding:0; }
 .ig-action-btn svg { width:26px; height:26px; stroke:#111; fill:none; stroke-width:1.8;
@@ -56,7 +58,6 @@ body { display:flex; align-items:center; justify-content:center; min-height:100v
 .live-header-wrap.hidden { opacity:0; max-height:0; pointer-events:none; margin:0; padding:0; }
 .live-event-label::before,.live-event-label::after { content:''; height:1px; width:40px; background:currentColor; opacity:.4; }
 .live-event-name-display { font-family:'Syne',sans-serif; font-size:clamp(28px,5vw,52px); font-weight:900; letter-spacing:-.04em; line-height:1; margin-bottom:10px; transition:color .5s; }
-.live-event-sub { font-family:'DM Sans',sans-serif; font-size:clamp(13px,1.8vw,20px); font-weight:300; color:rgba(255,255,255,.45); letter-spacing:.04em; margin-bottom:16px; }
 /* ── CONTENITORE PRINCIPALE ── */
 .dedica-container { flex:1; width:100%; display:flex; align-items:center; justify-content:center; padding:12px 0; min-height:0; }
 
@@ -70,15 +71,15 @@ body { display:flex; align-items:center; justify-content:center; min-height:100v
 .dedica-box.text-only .dedica-sender { font-family:'Syne',sans-serif; font-size:clamp(14px,2vw,22px); font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); animation:fade-up .6s .15s cubic-bezier(.22,1,.36,1) both; }
 
 /* ═══ CON FOTO — Instagram style ═══ */
-.dedica-box.has-photo { background:transparent; border:none; padding:0; width:min(74vh,72vw); display:flex; flex-direction:column; align-items:center; }
-.ig-header { width:100%; display:flex; align-items:center; gap:14px; padding:14px 20px; background:#ffffff; border:none; border-radius:22px 22px 0 0; }
+.dedica-box.has-photo { background:transparent; border:none; padding:0; width:min(74vh,72vw); display:flex; flex-direction:column; align-items:stretch; border-radius:22px; overflow:hidden; }
+.ig-header { width:100%; display:flex; align-items:center; gap:14px; padding:14px 20px; background:#ffffff; border-radius:22px 22px 0 0; box-sizing:border-box; }
 .ig-avatar { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--teal)); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-size:17px; font-weight:900; color:#fff; flex-shrink:0; }
 .ig-username { font-family:'Syne',sans-serif; font-size:clamp(14px,2vw,22px); font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#111; }
 .ig-live-dot { width:8px; height:8px; border-radius:50%; background:var(--teal); margin-left:auto; flex-shrink:0; animation:pulse-dot 1.8s infinite; box-shadow:0 0 8px var(--teal); }
-.ig-photo-frame { width:100%; aspect-ratio:1/1; overflow:hidden; border-radius:0; }
-.dedica-box.has-photo.no-caption .ig-photo-frame { border-radius:0 0 22px 22px; }
+.ig-photo-frame { width:100%; aspect-ratio:1/1; overflow:hidden; border-radius:0; position:relative; }
+.dedica-box.has-photo.no-caption .ig-photo-frame { border-radius:0 0 22px 22px; overflow:hidden; }
 .ig-photo-frame img { width:100%; height:100%; object-fit:cover; display:block; animation:fade-up .5s cubic-bezier(.22,1,.36,1); }
-.ig-caption { width:100%; padding:18px 22px 22px; background:#ffffff; border:none; border-top:1px solid #eee; border-radius:0 0 22px 22px; }
+.ig-caption { width:100%; padding:14px 20px 18px; background:#ffffff; border-top:1px solid #eee; border-radius:0 0 22px 22px; box-sizing:border-box; }
 .ig-caption-text { font-family:'DM Sans',sans-serif; font-size:clamp(16px,2.2vw,26px); font-weight:300; font-style:italic; line-height:1.4; color:#222; animation:fade-up .5s .1s cubic-bezier(.22,1,.36,1) both; }
 .ig-caption-text:empty { display:none; }
 .live-queue-info { position:absolute; bottom:24px; left:50%; transform:translateX(-50%); z-index:20; font-size:11px; color:rgba(255,255,255,.25); font-family:'Syne',sans-serif; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
@@ -97,7 +98,6 @@ body { display:flex; align-items:center; justify-content:center; min-height:100v
   <div class="live-header-wrap" id="live-header-wrap">
     <div class="live-event-label">Messaggi dal pubblico</div>
     <div class="live-event-name-display" id="live-event-name">MESSAGGI INDIE</div>
-    <div class="live-event-sub" id="live-event-sub">Sabato 7 Giugno · Arena Nord</div>
   </div>
   <div class="dedica-container">
     <!-- Attesa -->
@@ -181,7 +181,6 @@ onValue(settingsRef, snap => {
     settings.accentColor = c;
     const ne = document.getElementById('live-event-name');
     if(ne) { ne.textContent=settings.eventName; ne.style.color=c; }
-    const subEl=document.getElementById('live-event-sub'); if(subEl) subEl.textContent=settings.eventSub||'';
     const bg = document.getElementById('live-bg-gradient');
     if(bg) bg.style.background=`radial-gradient(ellipse 80% 50% at 10% 0%,rgba(30,60,160,.3) 0%,transparent 55%),radial-gradient(ellipse 60% 60% at 90% 100%,${hexToRgba(c,.15)} 0%,transparent 60%)`;
     document.querySelectorAll('.live-line-top').forEach(el=>el.style.background=`linear-gradient(90deg,transparent,${c},transparent)`);
