@@ -33,21 +33,29 @@ body { display:flex; align-items:center; justify-content:center; min-height:100v
 .live-event-label { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); opacity:.8; margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:10px; }
 .live-event-label::before,.live-event-label::after { content:''; height:1px; width:40px; background:currentColor; opacity:.4; }
 .live-event-name-display { font-family:'Syne',sans-serif; font-size:clamp(28px,5vw,52px); font-weight:900; letter-spacing:-.04em; line-height:1; margin-bottom:48px; transition:color .5s; }
-.dedica-container { min-height:220px; display:flex; align-items:center; justify-content:center; }
-.dedica-box { background:rgba(10,30,30,.75); border:1px solid rgba(30,200,208,.2); border-radius:24px; padding:44px 52px; max-width:860px; width:100%; backdrop-filter:blur(12px); position:relative; overflow:hidden; }
-.dedica-box::before { content:'\275D'; position:absolute; top:12px;left:24px; font-size:60px; opacity:.08; font-family:Georgia,serif; line-height:1; }
+/* ── CONTENITORE PRINCIPALE ── */
+.dedica-container { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; }
+
+/* ── STATO ATTESA ── */
 .dedica-waiting { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:rgba(255,255,255,.2); letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; gap:12px; justify-content:center; }
 .dedica-waiting::before { content:''; width:8px;height:8px; border-radius:50%; background:rgba(255,255,255,.2); animation:pulse-dot 2s infinite; }
-/* layout con foto */
-.dedica-inner { display:flex; align-items:center; gap:48px; }
-.dedica-photo-wrap { flex-shrink:0; max-width:42%; }
-.dedica-photo { display:block; max-width:100%; max-height:72vh; border-radius:18px; object-fit:contain; border:2px solid rgba(255,255,255,.15); box-shadow:0 12px 48px rgba(0,0,0,.6); animation:fade-up .6s cubic-bezier(.22,1,.36,1); }
-.dedica-txt-wrap { flex:1; text-align:left; }
-.dedica-text { font-family:'DM Sans',sans-serif; font-size:clamp(18px,3vw,28px); font-weight:300; font-style:italic; line-height:1.45; color:var(--text); margin-bottom:28px; animation:fade-up .6s cubic-bezier(.22,1,.36,1); }
-.dedica-sender { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); animation:fade-up .6s .15s cubic-bezier(.22,1,.36,1) both; }
-/* senza foto: centra il testo come prima */
-.dedica-inner.no-photo { justify-content:center; }
-.dedica-inner.no-photo .dedica-txt-wrap { text-align:center; }
+
+/* ═══ SOLO TESTO ═══ */
+.dedica-box.text-only { background:transparent; border:none; padding:0; max-width:900px; width:100%; text-align:center; }
+.dedica-box.text-only .dedica-text { font-family:'DM Sans',sans-serif; font-size:clamp(36px,6vw,80px); font-weight:300; font-style:italic; line-height:1.28; color:var(--text); margin-bottom:40px; animation:fade-up .6s cubic-bezier(.22,1,.36,1); }
+.dedica-box.text-only .dedica-sender { font-family:'Syne',sans-serif; font-size:clamp(14px,2vw,22px); font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); animation:fade-up .6s .15s cubic-bezier(.22,1,.36,1) both; }
+
+/* ═══ CON FOTO — Instagram style ═══ */
+.dedica-box.has-photo { background:transparent; border:none; padding:0; width:min(86vh,82vw); display:flex; flex-direction:column; align-items:center; }
+.ig-header { width:100%; display:flex; align-items:center; gap:14px; padding:14px 20px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-bottom:none; border-radius:22px 22px 0 0; backdrop-filter:blur(8px); }
+.ig-avatar { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--teal)); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-size:17px; font-weight:900; color:#fff; flex-shrink:0; }
+.ig-username { font-family:'Syne',sans-serif; font-size:clamp(14px,2vw,22px); font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#fff; }
+.ig-live-dot { width:8px; height:8px; border-radius:50%; background:var(--teal); margin-left:auto; flex-shrink:0; animation:pulse-dot 1.8s infinite; box-shadow:0 0 8px var(--teal); }
+.ig-photo-frame { width:100%; aspect-ratio:1/1; overflow:hidden; }
+.ig-photo-frame img { width:100%; height:100%; object-fit:cover; display:block; animation:fade-up .5s cubic-bezier(.22,1,.36,1); }
+.ig-caption { width:100%; padding:18px 22px 22px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-top:none; border-radius:0 0 22px 22px; backdrop-filter:blur(8px); }
+.ig-caption-text { font-family:'DM Sans',sans-serif; font-size:clamp(16px,2.2vw,26px); font-weight:300; font-style:italic; line-height:1.4; color:rgba(255,255,255,.9); animation:fade-up .5s .1s cubic-bezier(.22,1,.36,1) both; }
+.ig-caption-text:empty { display:none; }
 .live-queue-info { position:absolute; bottom:24px; left:50%; transform:translateX(-50%); z-index:20; font-size:11px; color:rgba(255,255,255,.25); font-family:'Syne',sans-serif; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
 .live-transition { position:absolute; inset:0; z-index:50; background:var(--deep); opacity:0; pointer-events:none; transition:opacity .3s; }
 .live-transition.flash { opacity:1; }</style>
@@ -64,18 +72,27 @@ body { display:flex; align-items:center; justify-content:center; min-height:100v
   <div class="live-event-label">Messaggi dal pubblico</div>
   <div class="live-event-name-display" id="live-event-name">MESSAGGI INDIE</div>
   <div class="dedica-container">
-    <div class="dedica-box">
-      <div class="dedica-waiting" id="dedica-waiting">In attesa di messaggi</div>
-      <div style="display:none" id="dedica-content">
-        <div class="dedica-inner" id="dedica-inner">
-          <div class="dedica-photo-wrap" id="dedica-photo-wrap" style="display:none">
-            <img class="dedica-photo" id="dedica-photo" src="" alt="selfie">
-          </div>
-          <div class="dedica-txt-wrap">
-            <div class="dedica-text" id="dedica-text"></div>
-            <div class="dedica-sender" id="dedica-sender"></div>
-          </div>
-        </div>
+    <!-- Attesa -->
+    <div class="dedica-waiting" id="dedica-waiting">In attesa di messaggi</div>
+
+    <!-- Solo testo -->
+    <div class="dedica-box text-only" id="dedica-text-only" style="display:none">
+      <div class="dedica-text" id="dedica-text"></div>
+      <div class="dedica-sender" id="dedica-sender"></div>
+    </div>
+
+    <!-- Con foto: stile Instagram -->
+    <div class="dedica-box has-photo" id="dedica-photo-card" style="display:none">
+      <div class="ig-header">
+        <div class="ig-avatar" id="ig-avatar">♪</div>
+        <div class="ig-username" id="ig-username"></div>
+        <div class="ig-live-dot"></div>
+      </div>
+      <div class="ig-photo-frame">
+        <img id="dedica-photo" src="" alt="">
+      </div>
+      <div class="ig-caption" id="ig-caption">
+        <div class="ig-caption-text" id="ig-caption-text"></div>
       </div>
     </div>
   </div>
@@ -157,33 +174,49 @@ function showNext() {
 }
 
 function renderMsg(msg) {
+  // nascondi tutto
   document.getElementById('dedica-waiting').style.display='none';
-  document.getElementById('dedica-content').style.display='block';
-  const dt=document.getElementById('dedica-text'), ds=document.getElementById('dedica-sender');
-  const photoWrap=document.getElementById('dedica-photo-wrap');
-  const photoImg=document.getElementById('dedica-photo');
-  const inner=document.getElementById('dedica-inner');
-  dt.style.animation='none'; ds.style.animation='none';
-  void dt.offsetWidth; void ds.offsetWidth;
-  dt.style.animation=''; ds.style.animation='';
-  dt.textContent = msg.msg;
-  ds.textContent = msg.nome ? '— '+msg.nome : '— Anonimo';
-  ds.style.color = settings.accentColor;
-  // foto
+  document.getElementById('dedica-text-only').style.display='none';
+  document.getElementById('dedica-photo-card').style.display='none';
+
+  const nome = msg.nome ? msg.nome : 'Anonimo';
+  const initial = nome.charAt(0).toUpperCase();
+
   if(msg.photoURL) {
-    photoImg.src = msg.photoURL;
-    photoWrap.style.display = 'block';
-    inner.className = 'dedica-inner';
+    // ── LAYOUT INSTAGRAM ──
+    const card = document.getElementById('dedica-photo-card');
+    // avatar iniziale + username
+    document.getElementById('ig-avatar').textContent = initial;
+    document.getElementById('ig-username').textContent = nome;
+    // foto
+    const img = document.getElementById('dedica-photo');
+    img.style.animation='none'; void img.offsetWidth; img.style.animation='';
+    img.src = msg.photoURL;
+    // caption (solo se c'è testo)
+    const captionEl = document.getElementById('ig-caption-text');
+    captionEl.textContent = msg.msg || '';
+    document.getElementById('ig-caption').style.display = msg.msg ? 'block' : 'none';
+    card.style.display='flex';
   } else {
-    photoWrap.style.display = 'none';
-    inner.className = 'dedica-inner no-photo';
+    // ── LAYOUT SOLO TESTO ──
+    const box = document.getElementById('dedica-text-only');
+    const dt = document.getElementById('dedica-text');
+    const ds = document.getElementById('dedica-sender');
+    dt.style.animation='none'; ds.style.animation='none';
+    void dt.offsetWidth; void ds.offsetWidth;
+    dt.style.animation=''; ds.style.animation='';
+    dt.textContent = msg.msg;
+    ds.textContent = '— ' + nome;
+    ds.style.color = settings.accentColor;
+    box.style.display='block';
   }
   spawnParticles();
 }
 
 function showWaiting() {
   document.getElementById('dedica-waiting').style.display='flex';
-  document.getElementById('dedica-content').style.display='none';
+  document.getElementById('dedica-text-only').style.display='none';
+  document.getElementById('dedica-photo-card').style.display='none';
   currentlyShowing=null; updateQueueInfo();
 }
 
