@@ -198,16 +198,16 @@ document.getElementById('selfie-input').addEventListener('change', async functio
   if (!file) return;
   selfieUploaded = null;
 
-  // Compress via Canvas (max 1400px, quality 0.88)
-  selfieDataURL = await compressImage(file, 1400, 0.88);
-
-  // Show preview
-  document.getElementById('selfie-preview').src = selfieDataURL;
+  // Preview istantanea dal file originale (senza compressione)
+  const previewURL = URL.createObjectURL(file);
+  selfieDataURL = previewURL;
+  document.getElementById('selfie-preview').src = previewURL;
   document.getElementById('selfie-preview-wrap').style.display = 'block';
   document.getElementById('selfie-trigger').style.display = 'none';
 
-  // Upload to Cloudinary immediately (in background) — file originale per massima qualità
-  uploadToCloudinary(selfieDataURL, file);
+  // Comprimi leggermente (1920px max, qualità 0.92) poi carica
+  const compressed = await compressImage(file, 1920, 0.92);
+  uploadToCloudinary(compressed, null);
 });
 
 async function compressImage(file, maxPx, quality) {
@@ -230,12 +230,12 @@ async function compressImage(file, maxPx, quality) {
   });
 }
 
-async function uploadToCloudinary(dataURL) {
+async function uploadToCloudinary(dataURL, originalFile) {
   document.getElementById('selfie-uploading').style.display = 'flex';
   updateSendBtn();
   try {
     const formData = new FormData();
-    formData.append('file', dataURL);
+    formData.append('file', originalFile || dataURL);
     formData.append('upload_preset', CLOUDINARY_PRESET);
     const res = await fetch(CLOUDINARY_URL, { method:'POST', body:formData });
     const json = await res.json();
