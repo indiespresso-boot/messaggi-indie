@@ -33,7 +33,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 .settings-title .toggle-arrow { margin-left:auto; transition:transform .25s; font-size:11px; color:var(--muted2); }
 .settings-title.open .toggle-arrow { transform:rotate(180deg); }
 .settings-body { overflow:hidden; max-height:0; transition:max-height .3s ease, padding .3s ease; }
-.settings-body.open { max-height:600px; padding-top:16px; }
+.settings-body.open { max-height:900px; padding-top:16px; }
 .settings-grid { display:grid; grid-template-columns:1fr 1fr 1fr 120px auto; gap:12px; align-items:end; }
 .s-group { display:flex; flex-direction:column; gap:6px; }
 .s-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
@@ -41,6 +41,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 .s-input:focus { border-color:rgba(240,78,55,.4); }
 .color-row { display:flex; gap:8px; align-items:center; }
 .s-color { width:36px; height:36px; border-radius:8px; border:2px solid var(--border); cursor:pointer; padding:2px; background:transparent; flex-shrink:0; }
+.text-grid { margin-top:16px; grid-template-columns:1fr 1fr 1fr auto; }
+.text-grid textarea { resize:vertical; line-height:1.4; }
+.s-hint { grid-column:1/-1; font-size:11px; color:var(--muted); }
 .btn-apply { padding:12px 20px; background:var(--accent); color:#ffffff; font-family:'Syne',sans-serif; font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; border:none; border-radius:9px; cursor:pointer; min-height:44px; width:100%; }
 .btn-apply:hover { opacity:.88; }
 
@@ -99,6 +102,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 /* ── MOBILE SETTINGS collapsed by default ── */
 @media(max-width:639px) {
   .settings-grid { grid-template-columns:1fr 1fr; }
+  .text-grid { grid-template-columns:1fr; }
   .settings-grid > .s-group:last-of-type { grid-column:1/-1; }
 }
 
@@ -154,6 +158,22 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
       </div>
       <button class="btn-apply" onclick="applySettings()">Applica</button>
     </div>
+    <div class="settings-grid text-grid">
+      <div class="s-group">
+        <div class="s-label">Titolo in alto</div>
+        <input class="s-input" id="s-title" type="text" maxlength="30">
+      </div>
+      <div class="s-group">
+        <div class="s-label">Testo a sinistra del QR</div>
+        <textarea class="s-input" id="s-text-left" rows="3" maxlength="120"></textarea>
+      </div>
+      <div class="s-group">
+        <div class="s-label">Testo a destra del QR</div>
+        <textarea class="s-input" id="s-text-right" rows="3" maxlength="120"></textarea>
+      </div>
+      <div class="s-hint">Scrivi *così* per il grassetto. Vai a capo per una nuova riga. Lascia vuoto per tornare al testo originale.</div>
+      <button class="btn-apply" onclick="applySettings()">Applica</button>
+    </div>
     </div><!-- /settings-body -->
   </div>
   <div class="queue-section">
@@ -193,8 +213,13 @@ const fbApp = initializeApp(firebaseConfig);
 const db = getDatabase(fbApp);
 const msgsRef = ref(db, 'messages');
 const settingsRef = ref(db, 'settings');
-let settings = { eventName: 'MESSAGGI INDIE', eventSub: 'Sabato 7 Giugno · Arena Nord', accentColor: '#f04e37', duration: 8 };
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+let settings = { eventName: 'MESSAGGI INDIE', eventSub: '', accentColor: '#f04e37', duration: 8 };
+let rejectedCount = 0;
+const DEFAULT_TEXTS = { title:'INDIESMS', textLeft:'Hey bro…\nscansiona\nquesto *QR CODE*', textRight:'e *INVIA* un sms sul nostro *MAXISCHERMO !*' };
+Object.assign(settings, DEFAULT_TEXTS);
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function safeColor(c) { return /^#[0-9a-fA-F]{6}$/.test(c) ? c : '#f04e37'; }
+function safeUrl(u) { return /^https:\/\//i.test(u) ? u : ''; }
 function lighten(hex) { let c=hex.replace('#',''); let r=Math.min(255,parseInt(c.slice(0,2),16)+60).toString(16).padStart(2,'0'); let g=Math.min(255,parseInt(c.slice(2,4),16)+60).toString(16).padStart(2,'0'); let b=Math.min(255,parseInt(c.slice(4,6),16)+60).toString(16).padStart(2,'0'); return '#'+r+g+b; }
 function initials(name) { if(!name||!name.trim()) return '?'; const p=name.trim().split(' '); return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():name.slice(0,2).toUpperCase(); }
 function fmtTime(ts) { const d=new Date(ts); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
@@ -205,12 +230,17 @@ let allMessages = {};
 onValue(settingsRef, snap => {
   if(snap.exists()) {
     settings = {...settings, ...snap.val()};
+    settings.accentColor = safeColor(settings.accentColor);
     document.getElementById('s-event-name').value = settings.eventName;
     document.getElementById('s-event-sub').value  = settings.eventSub;
     document.getElementById('s-color').value      = settings.accentColor;
     document.getElementById('s-color-hex').value  = settings.accentColor;
     document.getElementById('s-duration').value   = settings.duration || 8;
   }
+  // se i testi non sono ancora salvati si mostrano quelli originali
+  document.getElementById('s-title').value      = settings.title;
+  document.getElementById('s-text-left').value  = settings.textLeft;
+  document.getElementById('s-text-right').value = settings.textRight;
 });
 
 onValue(msgsRef, snap => {
@@ -223,10 +253,9 @@ function renderDash() {
   const msgs = Object.values(allMessages);
   const pending  = msgs.filter(m=>m.status==='pending');
   const approved = msgs.filter(m=>m.status==='approved');
-  const rejected = msgs.filter(m=>m.status==='rejected');
   document.getElementById('stat-pending').textContent   = pending.length;
   document.getElementById('stat-approved').textContent  = approved.length;
-  document.getElementById('stat-rejected').textContent  = rejected.length;
+  document.getElementById('stat-rejected').textContent  = rejectedCount;
   document.getElementById('pending-count').textContent  = pending.length;
   document.getElementById('approved-count').textContent = approved.length;
   renderList('list-pending',  pending.sort((a,b)=>a.ts-b.ts), true);
@@ -240,8 +269,9 @@ function renderList(id, items, isPending) {
     return;
   }
   c.innerHTML = items.map(m=>{
-    const photoHTML = m.photoURL
-      ? `<img class="msg-photo" src="${escHtml(m.photoURL)}" alt="selfie" onclick="openLightbox('${escHtml(m.photoURL)}')">`
+    const photo = safeUrl(m.photoURL);
+    const photoHTML = photo
+      ? `<img class="msg-photo" src="${escHtml(photo)}" alt="selfie" onclick="openLightbox(this.src)">`
       : '';
     return `
     <div class="msg-card ${m.status}">
@@ -251,7 +281,7 @@ function renderList(id, items, isPending) {
           <div class="msg-sender">
             <strong>${m.nome?escHtml(m.nome):'<em style="font-weight:400;color:var(--muted2)">Anonimo</em>'}</strong>
             <span class="msg-time">${fmtTime(m.ts)}</span>
-            ${m.photoURL ? '<span style="font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:1px 6px;">📷 foto</span>' : ''}
+            ${photo ? '<span style="font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:1px 6px;">📷 foto</span>' : ''}
           </div>
           <div class="msg-text">${escHtml(m.msg||'')}</div>
         </div>
@@ -268,7 +298,8 @@ function renderList(id, items, isPending) {
 }
 
 window.approveMsg = async k => { await update(ref(db,'messages/'+k),{status:'approved'}); showToast('✓ Approvato','success'); };
-window.rejectMsg  = async k => { await update(ref(db,'messages/'+k),{status:'rejected'}); showToast('✕ Rifiutato'); };
+// i messaggi rifiutati vengono eliminati dal database; il contatore vale per questa sessione
+window.rejectMsg  = async k => { await remove(ref(db,'messages/'+k)); rejectedCount++; document.getElementById('stat-rejected').textContent = rejectedCount; showToast('✕ Rifiutato'); };
 window.undoMsg    = async k => { await update(ref(db,'messages/'+k),{status:'pending'}); showToast('↩ Rimesso in coda'); };
 
 document.getElementById('s-color').addEventListener('input', function(){ document.getElementById('s-color-hex').value=this.value; });
@@ -277,8 +308,11 @@ document.getElementById('s-color-hex').addEventListener('input', function(){ if(
 window.applySettings = function() {
   settings.eventName   = document.getElementById('s-event-name').value.trim()||'EVENTO';
   settings.eventSub    = document.getElementById('s-event-sub').value.trim();
-  settings.accentColor = document.getElementById('s-color-hex').value||document.getElementById('s-color').value;
+  settings.accentColor = safeColor(document.getElementById('s-color-hex').value||document.getElementById('s-color').value);
   settings.duration    = Math.max(3, Math.min(60, parseInt(document.getElementById('s-duration').value)||8));
+  settings.title     = document.getElementById('s-title').value.trim()      || DEFAULT_TEXTS.title;
+  settings.textLeft  = document.getElementById('s-text-left').value.trim()  || DEFAULT_TEXTS.textLeft;
+  settings.textRight = document.getElementById('s-text-right').value.trim() || DEFAULT_TEXTS.textRight;
   set(settingsRef, settings);
   showToast('✓ Impostazioni applicate','success');
 };
