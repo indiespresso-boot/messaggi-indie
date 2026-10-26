@@ -111,7 +111,16 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 </style>
 </head>
 <body>
-<div id="wrap">
+<div id="login" style="position:fixed;inset:0;z-index:10000;background:var(--deep);display:flex;align-items:center;justify-content:center;padding:20px">
+  <form id="login-form" style="width:100%;max-width:340px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:14px">
+    <div class="dash-title">Accesso <span>Moderatore</span></div>
+    <input class="s-input" id="l-user" type="text" placeholder="Username" autocomplete="username" autocapitalize="none">
+    <input class="s-input" id="l-pass" type="password" placeholder="Password" autocomplete="current-password">
+    <div id="l-err" style="color:var(--accent);font-size:12px;min-height:16px"></div>
+    <button class="btn-apply" type="submit">Entra</button>
+  </form>
+</div>
+<div id="wrap" style="display:none">
   <div class="dash-header">
     <div class="dash-title">Dashboard <span>Moderatore</span></div>
     <div class="dash-stats">
@@ -135,8 +144,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
       <div class="s-group">
         <div class="s-label">Colore Accento</div>
         <div class="color-row">
-          <input class="s-color" id="s-color" type="color" value="#e8ff47">
-          <input class="s-input" id="s-color-hex" type="text" value="#e8ff47" style="flex:1" maxlength="7">
+          <input class="s-color" id="s-color" type="color" value="#f04e37">
+          <input class="s-input" id="s-color-hex" type="text" value="#f04e37" style="flex:1" maxlength="7">
         </div>
       </div>
       <div class="s-group">
@@ -259,7 +268,7 @@ function renderList(id, items, isPending) {
 }
 
 window.approveMsg = async k => { await update(ref(db,'messages/'+k),{status:'approved'}); showToast('✓ Approvato','success'); };
-window.rejectMsg  = async k => { await remove(ref(db,'messages/'+k)); showToast('✕ Rifiutato'); };
+window.rejectMsg  = async k => { await update(ref(db,'messages/'+k),{status:'rejected'}); showToast('✕ Rifiutato'); };
 window.undoMsg    = async k => { await update(ref(db,'messages/'+k),{status:'pending'}); showToast('↩ Rimesso in coda'); };
 
 document.getElementById('s-color').addEventListener('input', function(){ document.getElementById('s-color-hex').value=this.value; });
@@ -305,6 +314,24 @@ window.toggleSettings = function() {
   toggle.classList.toggle('open');
 };
 initSettings();
+
+// ── Login semplice (lato client) ──
+function unlock() {
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('wrap').style.display = 'block';
+}
+if(sessionStorage.getItem('mod-auth') === '1') unlock();
+document.getElementById('login-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  if(u === 'indiespresso' && p === 'serataindie') {
+    sessionStorage.setItem('mod-auth', '1');
+    unlock();
+  } else {
+    document.getElementById('l-err').textContent = 'Credenziali non valide';
+  }
+});
 </script>
 </body>
 </html>

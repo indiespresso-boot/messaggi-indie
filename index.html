@@ -206,7 +206,7 @@ document.getElementById('selfie-input').addEventListener('change', async functio
   document.getElementById('selfie-trigger').style.display = 'none';
 
   // Comprimi leggermente (1920px max, qualità 0.92) poi carica
-  const compressed = await compressImage(file, 1920, 0.92);
+  const compressed = await compressImage(file, 1600, 0.85);
   uploadToCloudinary(compressed, null);
 });
 
@@ -292,13 +292,19 @@ window.submitMsg = async function() {
   const msg  = document.getElementById('input-msg').value.trim();
   if (!msg && !selfieUploaded) return;
   if (isUploading()) { showToast('Attendere il caricamento della foto…'); return; }
+  // anti-spam: un invio ogni 30 secondi per dispositivo
+  let last = 0;
+  try { last = parseInt(localStorage.getItem('lastSend')) || 0; } catch(e) {}
+  const wait = Math.ceil((last + 30000 - Date.now()) / 1000);
+  if (wait > 0) { showToast('Attendi ' + wait + 's prima di inviare un altro messaggio', 'error'); return; }
 
   const btn = document.getElementById('btn-send');
   btn.disabled = true; btn.textContent = 'Invio…';
   try {
-    const record = { nome: nome||null, msg: msg||'', ts: Date.now(), status: 'pending' };
+    const record = { nome: nome ? nome.slice(0,40) : null, msg: msg.slice(0,140), ts: Date.now(), status: 'pending' };
     if (selfieUploaded) record.photoURL = selfieUploaded;
     await push(msgsRef, record);
+    try { localStorage.setItem('lastSend', String(Date.now())); } catch(e) {}
     document.getElementById('form-body').style.display = 'none';
     document.getElementById('form-success').style.display = 'flex';
   } catch(e) {

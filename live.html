@@ -146,7 +146,7 @@ body { display:flex; align-items:center; justify-content:center; min-height:100v
 <div class="toast" id="toast"></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, update, remove, set, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 const firebaseConfig = {
   apiKey: "AIzaSyApLhRbbVD2J84mVLEx8yMHI93U-D-ofQQ",
   authDomain: "messaggi-indie.firebaseapp.com",
@@ -172,6 +172,7 @@ let allMessages = {};
 let liveQueue = [];
 let currentlyShowing = null;
 let displayTimer = null;
+let claiming = false;
 
 onValue(settingsRef, snap => {
   if(snap.exists()) {
@@ -188,9 +189,15 @@ onValue(settingsRef, snap => {
   }
 });
 
+let firstSnap = true;
 onValue(msgsRef, snap => {
   allMessages={};
   if(snap.exists()) snap.forEach(c=>{ allMessages[c.key]={fbKey:c.key,...c.val()}; });
+  if(firstSnap) {
+    firstSnap = false;
+    // pulizia dei messaggi già mostrati in una sessione precedente
+    Object.values(allMessages).filter(m=>m.status==='shown').forEach(m=>remove(ref(db,'messages/'+m.fbKey)));
+  }
   syncQueue();
 });
 
@@ -201,14 +208,28 @@ function syncQueue() {
     .sort((a,b)=>a.ts-b.ts)
     .forEach(m=>liveQueue.push(m));
   updateQueueInfo();
-  if(!currentlyShowing&&liveQueue.length>0) showNext();
+  if(!currentlyShowing&&!claiming&&liveQueue.length>0) showNext();
 }
 
-function showNext() {
+async function showNext() {
+  clearTimeout(displayTimer);
+  // il messaggio appena concluso viene eliminato solo ora
+  if(currentlyShowing) { remove(ref(db,'messages/'+currentlyShowing.fbKey)); currentlyShowing = null; }
   if(!liveQueue.length) { showWaiting(); return; }
   const msg = liveQueue.shift();
+  // "prenota" il messaggio: se un altro schermo live l'ha già preso, passa al successivo
+  let claimed = false;
+  claiming = true;
+  try {
+    const res = await runTransaction(ref(db,'messages/'+msg.fbKey), cur => {
+      if(cur && cur.status==='approved') { cur.status='shown'; return cur; }
+      return; // annulla
+    });
+    claimed = res.committed;
+  } catch(e) { claimed = false; }
+  claiming = false;
+  if(!claimed) { updateQueueInfo(); showNext(); return; }
   currentlyShowing = msg;
-  remove(ref(db,'messages/'+msg.fbKey));
   updateQueueInfo();
   const ov = document.getElementById('live-transition');
   ov.classList.add('flash');
