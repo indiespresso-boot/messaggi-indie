@@ -71,17 +71,17 @@ body:not(.with-qr) .dedica-box.text-only { max-width:80vw; }
 .dedica-sender { display:inline-block; margin-left:1.5vw; background:var(--accent); color:var(--white); font-weight:700; font-size:clamp(16px,2.2vw,44px); letter-spacing:.04em; text-transform:uppercase; border-radius:99px; padding:.8vh 2vw; box-shadow:.3vw .3vw 0 var(--cyan); animation:fade-up .5s .2s cubic-bezier(.22,1,.36,1) both; }
 
 /* con foto: card sticker */
-.dedica-box.has-photo { width:min(55vh,50vw); flex-direction:column; background:var(--white); border-radius:2vw; overflow:hidden; box-shadow:.9vw .9vw 0 var(--cyan), 0 2vw 6vw rgba(0,0,0,.35); animation:pop-in .5s cubic-bezier(.34,1.56,.64,1); }
-body:not(.with-qr) .dedica-box.has-photo { width:min(60vh,62vw); }
-.ig-header { display:flex; align-items:center; gap:1.2vw; padding:1.6vh 1.6vw; background:var(--white); }
+.dedica-box.has-photo { width:min(64vh,52vw); max-height:94vh; flex-direction:column; background:var(--white); border-radius:2vw; overflow:hidden; box-shadow:.9vw .9vw 0 var(--cyan), 0 2vw 6vw rgba(0,0,0,.35); animation:pop-in .5s cubic-bezier(.34,1.56,.64,1); }
+body:not(.with-qr) .dedica-box.has-photo { width:min(68vh,66vw); }
+.ig-header { display:flex; align-items:center; gap:1.2vw; padding:1.1vh 1.6vw; flex-shrink:0; background:var(--white); }
 .ig-avatar { width:clamp(34px,3.4vw,66px); height:clamp(34px,3.4vw,66px); flex-shrink:0; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:clamp(16px,1.8vw,34px); color:var(--white); box-shadow:.2vw .2vw 0 var(--cyan); }
 .ig-username { font-weight:700; font-size:clamp(16px,1.9vw,38px); letter-spacing:.03em; text-transform:uppercase; color:var(--blue-deep); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .ig-live-dot { width:.8vw; height:.8vw; min-width:9px; min-height:9px; border-radius:50%; background:var(--accent); margin-left:auto; flex-shrink:0; animation:pulse-dot 1.8s infinite; }
-.ig-photo-frame { width:100%; aspect-ratio:1/1; overflow:hidden; background:var(--blue-dark); }
+.ig-photo-frame { width:100%; aspect-ratio:1/1; min-height:0; flex:0 1 auto; overflow:hidden; background:var(--blue-dark); }
 .ig-photo-frame img { width:100%; height:100%; object-fit:cover; display:block; animation:fade-up .5s cubic-bezier(.22,1,.36,1); }
-.ig-caption { padding:1.6vh 1.6vw; background:var(--white); border-top:3px solid var(--blue-deep); }
+.ig-caption { flex-shrink:0; padding:1.2vh 1.6vw; background:var(--white); border-top:3px solid var(--blue-deep); }
 .ig-caption-text { font-weight:500; font-size:clamp(16px,2.1vw,42px); line-height:1.25; color:var(--blue-deep); word-break:break-word; animation:fade-up .5s .1s cubic-bezier(.22,1,.36,1) both; }
-.ig-actions { display:flex; align-items:center; gap:1.6vw; padding:1.4vh 1.6vw 1.8vh; background:var(--white); }
+.ig-actions { flex-shrink:0; display:flex; align-items:center; gap:1.6vw; padding:1vh 1.6vw 1.3vh; background:var(--white); }
 .dedica-box.has-photo.no-caption .ig-actions { border-top:3px solid var(--blue-deep); }
 .ig-action-btn { display:flex; align-items:center; gap:.6vw; background:none; border:none; cursor:default; padding:0; }
 .ig-action-btn svg { width:clamp(22px,2.1vw,42px); height:clamp(22px,2.1vw,42px); stroke:var(--blue-deep); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
