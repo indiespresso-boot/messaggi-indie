@@ -39,7 +39,7 @@ body::before { content:''; position:fixed; inset:0; background:radial-gradient(e
 .f-input { width:100%; background:#faf9f7; border:1px solid var(--border); border-radius:11px; padding:12px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; margin-bottom:16px; transition:border-color .2s,background .2s; resize:none; }
 .f-input:focus { border-color:rgba(30,200,208,.6); background:rgba(30,200,208,.03); }
 .f-input::placeholder { color:var(--muted2); }
-.f-textarea { height:120px; line-height:1.55; }
+.f-textarea { height:90px; line-height:1.55; }
 .f-meta { display:flex; justify-content:flex-end; margin-top:-10px; margin-bottom:20px; }
 .f-charcount { font-size:10px; color:var(--muted2); }
 .f-charcount span { color:var(--accent); }
@@ -97,9 +97,9 @@ body::before {
     <label class="f-label">Il tuo nome <em>(opzionale)</em></label>
     <input class="f-input" id="input-nome" type="text" placeholder="Es. Marco, Sara…" maxlength="40" autocomplete="off">
     <label class="f-label">Il tuo messaggio</label>
-    <textarea class="f-input f-textarea" id="input-msg" placeholder="Scrivi il tuo messaggio…" maxlength="140"></textarea>
+    <textarea class="f-input f-textarea" id="input-msg" placeholder="Scrivi il tuo messaggio…" maxlength="40"></textarea>
     <div class="f-meta">
-      <div class="f-charcount" id="charcount"><span>0</span> / 140</div>
+      <div class="f-charcount" id="charcount"><span>0</span> / 40</div>
     </div>
 
     <!-- SELFIE SECTION -->
@@ -190,8 +190,8 @@ onValue(settingsRef, snap => {
 document.getElementById('input-msg').addEventListener('input', function() {
   const len = this.value.length;
   const cc = document.getElementById('charcount');
-  cc.innerHTML = `<span>${len}</span> / 140`;
-  cc.className = 'f-charcount' + (len > 120 ? ' warn' : '');
+  cc.innerHTML = `<span>${len}</span> / 40`;
+  cc.className = 'f-charcount' + (len > 30 ? ' warn' : '');
   updateSendBtn();
 });
 // Aggiorna subito il pulsante (attivo se c'è msg OPPURE foto)
@@ -307,7 +307,7 @@ window.submitMsg = async function() {
   const btn = document.getElementById('btn-send');
   btn.disabled = true; btn.textContent = 'Invio…';
   try {
-    const record = { nome: nome ? nome.slice(0,40) : null, msg: msg.slice(0,140), ts: Date.now(), status: 'pending' };
+    const record = { nome: nome ? nome.slice(0,40) : null, msg: msg.slice(0,40), ts: Date.now(), status: 'pending' };
     if (selfieUploaded) record.photoURL = selfieUploaded;
     await push(msgsRef, record);
     try { localStorage.setItem('lastSend', String(Date.now())); } catch(e) {}
@@ -322,7 +322,7 @@ window.submitMsg = async function() {
 window.resetForm = function() {
   document.getElementById('input-nome').value = '';
   document.getElementById('input-msg').value = '';
-  document.getElementById('charcount').innerHTML = '<span>0</span> / 140';
+  document.getElementById('charcount').innerHTML = '<span>0</span> / 40';
   document.getElementById('btn-send').disabled = true;
   document.getElementById('btn-send').innerHTML = 'Invia messaggio <span>→</span>';
   document.getElementById('form-body').style.display = 'block';
