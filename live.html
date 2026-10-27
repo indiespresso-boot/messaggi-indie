@@ -103,7 +103,16 @@ body:not(.with-qr) .dedica-box.has-photo { width:min(68vh,66vw); }
 .side-logo { position:fixed; left:2.4vw; bottom:3vh; height:clamp(50px,11vh,190px); width:auto; z-index:12; opacity:0; transition:opacity .45s; }
 body.with-qr .side-logo { opacity:1; }
 
-.live-queue-info { position:absolute; bottom:2.4vh; left:50%; transform:translateX(-50%); z-index:20; font-size:clamp(11px,1vw,20px); font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+/* adesivo "+N in arrivo" */
+.live-queue-info { position:absolute; top:2.4vh; left:2vw; z-index:30; font-weight:700; font-size:clamp(12px,1.3vw,26px); letter-spacing:.08em; text-transform:uppercase; color:var(--white); background:var(--accent); border-radius:99px; padding:.5vh 1.3vw; box-shadow:.25vw .25vw 0 var(--cyan); animation:pop-in .4s cubic-bezier(.34,1.56,.64,1); }
+.live-queue-info:empty { display:none; }
+
+/* carte in coda: ventaglio dietro il messaggio in onda, più piccole e sfocate */
+.dedica-container { position:relative; isolation:isolate; }
+.queue-ghost { position:absolute; left:50%; top:50%; z-index:-1; box-sizing:border-box; border:.45vw solid var(--white); border-radius:2vw; background:var(--accent) center/cover no-repeat; filter:blur(.45vw); opacity:0; pointer-events:none; transform:translate(-50%,-50%) scale(.8); transition:transform .6s cubic-bezier(.34,1.56,.64,1), opacity .5s; }
+.queue-ghost.on { opacity:.85; }
+.queue-ghost.g1.on { transform:translate(calc(-50% - 5.6vw),-50%) rotate(-5deg) scale(.94); }
+.queue-ghost.g2.on { transform:translate(calc(-50% + 6vw),-50%) rotate(6deg) scale(.9); opacity:.7; }
 .live-transition { position:absolute; inset:0; z-index:50; background:var(--blue-deep); opacity:0; pointer-events:none; transition:opacity .3s; }
 .live-transition.flash { opacity:1; }
 </style>
@@ -149,7 +158,10 @@ body.with-qr .side-logo { opacity:1; }
 <img class="side-logo" src="logo.png" alt="Indie Espresso">
 
 <div class="live-content">
-  <div class="dedica-container">
+  <div class="dedica-container" id="dedica-container">
+    <!-- Carte in coda (ventaglio dietro il messaggio) -->
+    <div class="queue-ghost g1" id="queue-ghost-1"></div>
+    <div class="queue-ghost g2" id="queue-ghost-2"></div>
     <!-- Solo testo -->
     <div class="dedica-box text-only" id="dedica-text-only">
       <div class="bubble"><div class="dedica-text" id="dedica-text"></div></div>
@@ -370,6 +382,7 @@ function renderMsg(msg) {
   document.getElementById('ig-like-count').textContent = (Math.floor(Math.random()*800)+800).toLocaleString('it-IT');
   document.getElementById('ig-comment-count').textContent = Math.floor(Math.random()*150)+80;
   spawnParticles();
+  updateStack();
 }
 
 function showWaiting() {
@@ -384,7 +397,26 @@ function showWaiting() {
 
 function updateQueueInfo() {
   const el=document.getElementById('live-queue-info');
-  el.textContent=liveQueue.length>0?`${liveQueue.length} messagg${liveQueue.length>1?'i':'io'} in coda`:'';
+  const n = currentlyShowing ? liveQueue.length : 0;
+  const testo = n>0 ? `+${n} in arrivo` : '';
+  if(el.textContent!==testo) el.textContent=testo;
+  updateStack();
+}
+
+// ventaglio delle prossime 2 carte dietro il messaggio in onda
+function updateStack() {
+  const box = ['dedica-photo-card','dedica-text-only'].map(id=>document.getElementById(id)).find(b=>b.style.display==='flex');
+  [0,1].forEach(i=>{
+    const g = document.getElementById('queue-ghost-'+(i+1));
+    const next = liveQueue[i];
+    if(!box || !currentlyShowing || !next) { g.classList.remove('on'); return; }
+    // stessa misura della carta in onda (offsetWidth/Height non risentono delle animazioni)
+    g.style.width = box.offsetWidth+'px';
+    g.style.height = box.offsetHeight+'px';
+    const url = next.photoURL && /^https:\/\//i.test(next.photoURL) ? next.photoURL : '';
+    g.style.backgroundImage = url ? `url("${url}")` : 'none';
+    g.classList.add('on');
+  });
 }
 
 function spawnParticles() {
