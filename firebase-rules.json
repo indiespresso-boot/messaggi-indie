@@ -1,0 +1,25 @@
+{
+  "rules": {
+    "settings": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "messages": {
+      ".read": "auth != null",
+      "$id": {
+        ".write": "auth != null || (!data.exists() && newData.child('status').val() === 'pending')",
+        ".validate": "newData.child('msg').isString() && newData.child('msg').val().length <= 40 && newData.child('ts').isNumber() && newData.child('status').isString() && (!newData.child('nome').exists() || (newData.child('nome').isString() && newData.child('nome').val().length <= 40)) && (!newData.child('photoURL').exists() || (newData.child('photoURL').isString() && newData.child('photoURL').val().matches(/^https:\\/\\/.*/)))",
+        "msg": {},
+        "nome": {},
+        "ts": {},
+        "status": {},
+        "photoURL": {},
+        "$altro": { ".validate": false }
+      }
+    },
+    "$altro": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

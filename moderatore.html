@@ -118,7 +118,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 <div id="login" style="position:fixed;inset:0;z-index:10000;background:var(--deep);display:flex;align-items:center;justify-content:center;padding:20px">
   <form id="login-form" style="width:100%;max-width:340px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:14px">
     <div class="dash-title">Accesso <span>Moderatore</span></div>
-    <input class="s-input" id="l-user" type="text" placeholder="Username" autocomplete="username" autocapitalize="none">
+    <input class="s-input" id="l-user" type="email" placeholder="Email" autocomplete="username" autocapitalize="none">
     <input class="s-input" id="l-pass" type="password" placeholder="Password" autocomplete="current-password">
     <div id="l-err" style="color:var(--accent);font-size:12px;min-height:16px"></div>
     <button class="btn-apply" type="submit">Entra</button>
@@ -200,6 +200,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--deep); color:var(--tex
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 const firebaseConfig = {
   apiKey: "AIzaSyApLhRbbVD2J84mVLEx8yMHI93U-D-ofQQ",
   authDomain: "messaggi-indie.firebaseapp.com",
@@ -243,11 +244,16 @@ onValue(settingsRef, snap => {
   document.getElementById('s-text-right').value = settings.textRight;
 });
 
-onValue(msgsRef, snap => {
-  allMessages = {};
-  if(snap.exists()) snap.forEach(c => { allMessages[c.key] = {fbKey:c.key,...c.val()}; });
-  renderDash();
-});
+// i messaggi si leggono solo dopo il login (vedi onAuthStateChanged più sotto)
+let stopMsgs = null;
+function startMessages() {
+  if(stopMsgs) return;
+  stopMsgs = onValue(msgsRef, snap => {
+    allMessages = {};
+    if(snap.exists()) snap.forEach(c => { allMessages[c.key] = {fbKey:c.key,...c.val()}; });
+    renderDash();
+  });
+}
 
 function renderDash() {
   const msgs = Object.values(allMessages);
@@ -349,21 +355,23 @@ window.toggleSettings = function() {
 };
 initSettings();
 
-// ── Login semplice (lato client) ──
-function unlock() {
-  document.getElementById('login').style.display = 'none';
-  document.getElementById('wrap').style.display = 'block';
-}
-if(sessionStorage.getItem('mod-auth') === '1') unlock();
-document.getElementById('login-form').addEventListener('submit', e => {
+// ── Login con Firebase Authentication ──
+// La vera protezione sono le regole del database: senza login non si legge né si modifica nulla.
+const auth = getAuth(fbApp);
+onAuthStateChanged(auth, user => {
+  document.getElementById('login').style.display = user ? 'none' : 'flex';
+  document.getElementById('wrap').style.display = user ? 'block' : 'none';
+  if(user) startMessages();
+});
+document.getElementById('login-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const u = document.getElementById('l-user').value.trim();
-  const p = document.getElementById('l-pass').value;
-  if(u === 'indiespresso' && p === 'serataindie') {
-    sessionStorage.setItem('mod-auth', '1');
-    unlock();
-  } else {
-    document.getElementById('l-err').textContent = 'Credenziali non valide';
+  const err = document.getElementById('l-err');
+  err.textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, document.getElementById('l-user').value.trim(), document.getElementById('l-pass').value);
+    document.getElementById('l-pass').value = '';
+  } catch(ex) {
+    err.textContent = 'Credenziali non valide';
   }
 });
 </script>

@@ -191,9 +191,18 @@ body.with-qr .side-logo { opacity:1; }
 <div class="live-queue-info" id="live-queue-info"></div>
 <div class="live-transition" id="live-transition"></div>
 <div class="toast" id="toast"></div>
+<div id="login" style="position:fixed;inset:0;z-index:10000;background:#2a12b4;display:none;align-items:center;justify-content:center;padding:20px;font-family:'Fredoka',sans-serif">
+  <form id="login-form" style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px">
+    <input id="l-user" type="email" placeholder="Email" autocomplete="username" style="padding:12px;border-radius:10px;border:0;font:inherit">
+    <input id="l-pass" type="password" placeholder="Password" autocomplete="current-password" style="padding:12px;border-radius:10px;border:0;font:inherit">
+    <div id="l-err" style="color:#ff5d5e;min-height:18px;font-size:14px"></div>
+    <button type="submit" style="padding:12px;border-radius:10px;border:0;background:#ff5d5e;color:#fff;font:inherit;font-weight:600;cursor:pointer">Collega lo schermo</button>
+  </form>
+</div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue, remove, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 const firebaseConfig = {
   apiKey: "AIzaSyApLhRbbVD2J84mVLEx8yMHI93U-D-ofQQ",
   authDomain: "messaggi-indie.firebaseapp.com",
@@ -250,16 +259,39 @@ onValue(settingsRef, snap => {
   }
 });
 
+// Login: i messaggi si leggono solo dopo l'accesso (le regole del database lo richiedono).
+// Lo schermo accede una volta sola, poi Firebase ricorda la sessione.
+const auth = getAuth(fbApp);
 let firstSnap = true;
-onValue(msgsRef, snap => {
-  allMessages={};
-  if(snap.exists()) snap.forEach(c=>{ allMessages[c.key]={fbKey:c.key,...c.val()}; });
-  if(firstSnap) {
-    firstSnap = false;
-    // pulizia dei messaggi già mostrati in una sessione precedente
-    Object.values(allMessages).filter(m=>m.status==='shown').forEach(m=>remove(ref(db,'messages/'+m.fbKey)));
+let msgsStarted = false;
+function startMessages() {
+  if(msgsStarted) return;
+  msgsStarted = true;
+  onValue(msgsRef, snap => {
+    allMessages={};
+    if(snap.exists()) snap.forEach(c=>{ allMessages[c.key]={fbKey:c.key,...c.val()}; });
+    if(firstSnap) {
+      firstSnap = false;
+      // pulizia dei messaggi già mostrati in una sessione precedente
+      Object.values(allMessages).filter(m=>m.status==='shown').forEach(m=>remove(ref(db,'messages/'+m.fbKey)));
+    }
+    syncQueue();
+  });
+}
+onAuthStateChanged(auth, user => {
+  document.getElementById('login').style.display = user ? 'none' : 'flex';
+  if(user) startMessages();
+});
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = document.getElementById('l-err');
+  err.textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, document.getElementById('l-user').value.trim(), document.getElementById('l-pass').value);
+    document.getElementById('l-pass').value = '';
+  } catch(ex) {
+    err.textContent = 'Credenziali non valide';
   }
-  syncQueue();
 });
 
 function syncQueue() {
