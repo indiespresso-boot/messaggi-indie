@@ -1,0 +1,8 @@
+# Note di lavoro e originali: restano solo sul PC, non vanno su GitHub (repository pubblico)
+CLAUDE.md
+originali/
+
+# File locali e di sistema
+.env
+*.local.*
+Thumbs.db
